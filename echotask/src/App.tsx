@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createTask, listTasks, removeTask, toggleDone, Task } from './db';
+import { createTask, listTasks, removeTask, toggleDone, Task, safeId } from './db';
 import { localRewrite, cloudRewrite } from './rewrite';
 import { sttSupported, startLocalSTT, recordAndTranscribeCloud } from './stt';
+
 // (optionnel) import { useIOSInstallHint } from "./hooks/useInstallPrompt";
 
 const nowIso = () => new Date().toISOString();
@@ -30,18 +31,19 @@ export default function App() {
 
   async function add(raw: string, cleanText?: string | null) {
     const t: Task = {
-      id: crypto.randomUUID(),
+      id: safeId(),
       rawText: raw,
       cleanText: cleanText ?? null,
       status: 'active',
       tags: [],
       due: null,
-      createdAt: nowIso(),
-      updatedAt: nowIso()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     await createTask(t);
     await refresh();
   }
+
 
   // === STT local (Web Speech)
   function startLocal() {
@@ -95,9 +97,9 @@ export default function App() {
       setClean('');
       alert('Tâche enregistrée ✅');
     } catch (e:any) {
-      alert('Échec de la sauvegarde. Réessaie.');
-      console.error(e);
-    }
+        console.error('SAVE_ERROR', e);
+        alert('Échec de la sauvegarde. Détail console.');
+      }
   }
 
   async function onImprove() {
