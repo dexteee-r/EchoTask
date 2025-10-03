@@ -5,3 +5,7 @@ button { padding:10px 12px; border-radius:8px; border:1px solid #ccc; background
 button:active { transform: translateY(1px); }
 input, textarea, select { border-radius:8px; border:1px solid #ccc; padding:10px; width:100%; }
 h1, h3 { margin:0; font-weight:700; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.chip { font-size:12px; padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; }
+.input-row { display:flex; gap:8px; align-items:center; }
+.badge { padding:6px 10px; border:1px solid #ddd; border-radius:8px; background:#f9f9f9; }
