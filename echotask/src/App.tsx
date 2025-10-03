@@ -3,6 +3,8 @@ import { createTask, listTasks, removeTask, toggleDone, Task, safeId } from './d
 import { localRewrite, cloudRewrite } from './rewrite';
 import { sttSupported, startLocalSTT, recordAndTranscribeCloud } from './stt';
 import { ToastHost, toast } from './ui/Toast';
+import { useI18n, LANG_META } from './i18n';
+import LanguageSwitch from './ui/LanguageSwitch';
 
 const nowIso = () => new Date().toISOString();
 const parseTags = (s: string) =>
@@ -31,24 +33,32 @@ export default function App() {
   const [listeningCloud, setListeningCloud] = useState(false);
   const stopLocalRef = useRef<null | (()=>void)>(null);
 
-  // Privacy / Cloud
+  // Cloud (persisté)
   const [allowCloud, setAllowCloud] = useState(() => localStorage.getItem("allowCloud")==="1");
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("apiKey") || "");
   useEffect(()=>{ localStorage.setItem("allowCloud", allowCloud ? "1":"0"); },[allowCloud]);
   useEffect(()=>{ localStorage.setItem("apiKey", apiKey); },[apiKey]);
+
+  // i18n
+  const { t, lang } = useI18n();
+  const meta = LANG_META[lang]; // { stt: 'fr-FR'|'en-US'|'ar-SA', whisper: 'fr'|'en'|'ar', dir }
 
   async function baseList() {
     return await listTasks(filter);
   }
 
   async function refresh() {
-    // récupère puis filtre côté client (texte + tags)
     const rows = await baseList();
     const q = search.trim().toLowerCase();
     const tags = activeFilterTags();
-    const filtered = rows.filter(t => {
-      const matchText = !q || (t.rawText?.toLowerCase().includes(q) || (t.cleanText||'').toLowerCase().includes(q));
-      const matchTags = tags.length === 0 || tags.every(tag => (t.tags||[]).map(s=>s.toLowerCase()).includes(tag));
+    const filtered = rows.filter(tk => {
+      const matchText =
+        !q ||
+        tk.rawText?.toLowerCase().includes(q) ||
+        (tk.cleanText || '').toLowerCase().includes(q);
+      const matchTags =
+        tags.length === 0 ||
+        tags.every(tag => (tk.tags || []).map(s=>s.toLowerCase()).includes(tag));
       return matchText && matchTags;
     });
     setTasks(filtered);
@@ -56,7 +66,7 @@ export default function App() {
   useEffect(() => { refresh(); }, [filter, search, tagFilter]);
 
   async function add(raw: string, cleanText?: string | null, tagsStr?: string) {
-    const t: Task = {
+    const tsk: Task = {
       id: safeId(),
       rawText: raw,
       cleanText: cleanText ?? null,
@@ -66,21 +76,21 @@ export default function App() {
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
-    await createTask(t);
+    await createTask(tsk);
     await refresh();
   }
 
   // === STT local (Web Speech)
   function startLocal() {
     if (!sttSupported()) {
-      toast('STT local non supporté ici. Utilise Chrome/Edge ou le Cloud.', { type:'info' });
+      toast(t("toast.sttUnsupported"), { type:'info' });
       return;
     }
     setListeningLocal(true);
     stopLocalRef.current = startLocalSTT(
-      (t)=>{ setDraft(t); setClean(localRewrite(t)); },
+      (tx)=>{ setDraft(tx); setClean(localRewrite(tx)); },
       ()=> setListeningLocal(false),
-      'fr-FR'
+      meta.stt // fr-FR / en-US / ar-SA
     );
   }
   function stopLocal() { stopLocalRef.current?.(); setListeningLocal(false); }
@@ -88,10 +98,10 @@ export default function App() {
   // === STT cloud (Whisper) — opt-in
   let cloudStop: null | (()=>Promise<void>) = null as any;
   async function startCloud() {
-    if (!allowCloud || !apiKey) { toast('Cloud OFF ou clé API manquante.', { type:'error' }); return; }
+    if (!allowCloud || !apiKey) { toast(t("toast.recStartError"), { type:'error' }); return; }
     try {
       setListeningCloud(true);
-      const rec = await recordAndTranscribeCloud(apiKey, 'fr');
+      const rec = await recordAndTranscribeCloud(apiKey, meta.whisper); // fr/en/ar
       cloudStop = async () => {
         const text = await rec.stop();
         setDraft(text);
@@ -101,7 +111,7 @@ export default function App() {
       };
     } catch (e) {
       setListeningCloud(false);
-      toast('Impossible de démarrer l’enregistrement (HTTPS/permissions ?)', { type:'error' });
+      toast(t("toast.recStartError"), { type:'error' });
       console.error(e);
     }
   }
@@ -113,32 +123,32 @@ export default function App() {
     if (!input.trim()) return;
     await add(input.trim(), null, inputTags);
     setInput(''); setInputTags('');
-    toast('Tâche ajoutée', { type:'success' });
+    toast(t("toast.added"), { type:'success' });
   }
 
   async function onSaveDraft() {
     try {
-      if (!draft.trim() && !clean.trim()) { toast('Rien à sauvegarder', { type:'info' }); return; }
+      if (!draft.trim() && !clean.trim()) { toast(t("toast.nothingToSave"), { type:'info' }); return; }
       await add(draft.trim(), clean.trim() ? clean.trim() : null, draftTags);
       setDraft(''); setClean(''); setDraftTags('');
       await refresh();
-      toast('Tâche enregistrée ✅', { type:'success' });
+      toast(t("toast.saved"), { type:'success' });
     } catch (e) {
       console.error(e);
-      toast('Échec de la sauvegarde', { type:'error' });
+      toast(t("toast.rewriteError"), { type:'error' });
     }
   }
 
   async function onImprove() {
     try {
       if (allowCloud && apiKey) {
-        const out = await cloudRewrite(draft, apiKey, 'fr', 'neutral');
+        const out = await cloudRewrite(draft, apiKey, lang, 'neutral');
         setClean(out);
       } else {
         setClean(localRewrite(draft));
       }
     } catch {
-      toast('Réécriture indisponible', { type:'error' });
+      toast(t("toast.rewriteError"), { type:'error' });
     }
   }
 
@@ -149,30 +159,36 @@ export default function App() {
       {/* TOAST HOST */}
       <ToastHost />
 
-      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8 }}>
-        <h1 style={{ margin:0 }}>EchoTask</h1>
+      {/* Header */}
+      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+        <h1 style={{ margin:0 }}>{t("app.title")}</h1>
+
         <div className="input-row">
           <select value={filter} onChange={e=>setFilter(e.target.value as any)} className="badge">
-            <option value="all">Tous</option>
-            <option value="active">Actifs</option>
-            <option value="done">Faits</option>
+            <option value="all">{t("filter.all")}</option>
+            <option value="active">{t("filter.active")}</option>
+            <option value="done">{t("filter.done")}</option>
           </select>
+
           <button type="button" onClick={()=>setAllowCloud(v=>!v)} className="badge">
-            {allowCloud ? 'Cloud: ON' : 'Cloud: OFF'}
+            {allowCloud ? t("cloud.on") : t("cloud.off")}
           </button>
+
+          <LanguageSwitch />
         </div>
       </header>
 
+      {/* Clé API (si Cloud visible) */}
       {allowCloud && (
         <div style={{ marginTop:8 }}>
           <input
-            placeholder="Clé API (stockée localement)"
+            placeholder={t("api.key.placeholder")}
             value={apiKey}
             onChange={e=>setApiKey(e.target.value)}
             style={{ width:'100%', padding:8, borderColor: !apiKey && allowCloud ? '#b00020':'#ccc', borderWidth:1, borderStyle:'solid', borderRadius:8 }}
           />
           {allowCloud && !apiKey && (
-            <div style={{ color:'#b00020', marginTop:4 }}>⚠️ Clé API requise pour le mode Cloud.</div>
+            <div style={{ color:'#b00020', marginTop:4 }}>⚠️ {t("api.key.placeholder")}</div>
           )}
         </div>
       )}
@@ -182,13 +198,13 @@ export default function App() {
         <input
           value={search}
           onChange={e=>setSearch(e.target.value)}
-          placeholder="Rechercher (titre/clean)…"
+          placeholder={t("search.placeholder")}
           style={{ padding:12, border:'1px solid #ccc', borderRadius:8 }}
         />
         <input
           value={tagFilter}
           onChange={e=>setTagFilter(e.target.value)}
-          placeholder="Filtrer par tags (séparés par des virgules)"
+          placeholder={t("tags.filter.placeholder")}
           style={{ padding:12, border:'1px solid #ccc', borderRadius:8 }}
         />
       </div>
@@ -199,56 +215,58 @@ export default function App() {
           <input
             value={input}
             onChange={e=>setInput(e.target.value)}
-            placeholder="Tape ta tâche…"
+            placeholder={t("input.placeholder")}
             style={{ flex:1, padding:12, border:'1px solid #ccc', borderRadius:8 }}
           />
-          <button type="submit">Ajouter</button>
+          <button type="submit">{t("btn.add")}</button>
         </form>
         <input
           value={inputTags}
           onChange={e=>setInputTags(e.target.value)}
-          placeholder="Tags de la tâche (ex: école, appel)"
+          placeholder={t("input.tags.placeholder")}
           style={{ padding:10, border:'1px solid #ddd', borderRadius:8 }}
         />
 
+        {/* Micro local / Cloud */}
         <div className="input-row">
           <button
             type="button"
             onPointerDown={startLocal}
             onPointerUp={stopLocal}
             disabled={unsupportedSTT}
-            title={unsupportedSTT ? 'STT local non supporté sur ce navigateur' : 'Maintenir pour parler (local)'}
+            title={unsupportedSTT ? t("toast.sttUnsupported") : t("btn.local")}
           >
-            🎤 Local {listeningLocal ? '●' : ''}
+            🎤 {t("btn.local")} {listeningLocal ? '●' : ''}
           </button>
 
           <button
             type="button"
             onPointerDown={startCloud}
             onPointerUp={stopCloud}
-            title="Maintenir pour parler (Cloud)"
+            title={t("btn.cloud")}
           >
-            ☁️ Cloud {listeningCloud ? '●' : ''}
+            ☁️ {t("btn.cloud")} {listeningCloud ? '●' : ''}
           </button>
         </div>
 
+        {/* Brouillon */}
         {draft && (
           <div style={{ border:'1px solid #eee', borderRadius:8, padding:12 }}>
-            <h3 style={{ marginTop:0 }}>Brouillon</h3>
-            <label>RAW</label>
+            <h3 style={{ marginTop:0 }}>{t("draft.title")}</h3>
+            <label>{t("raw")}</label>
             <textarea value={draft} onChange={e=>setDraft(e.target.value)} rows={3} style={{ width:'100%' }} />
-            <label>CLEAN</label>
+            <label>{t("clean")}</label>
             <textarea value={clean} onChange={e=>setClean(e.target.value)} rows={3} style={{ width:'100%' }} />
             <input
               value={draftTags}
               onChange={e=>setDraftTags(e.target.value)}
-              placeholder="Tags du brouillon (virgules)"
+              placeholder={t("draft.tags.placeholder")}
               style={{ marginTop:8, padding:10, border:'1px solid #ddd', borderRadius:8 }}
             />
             <div style={{ display:'flex', gap:8, marginTop:8 }}>
-              <button type="button" onClick={onImprove}>Améliorer</button>
-              <button type="button" onClick={onSaveDraft}>Sauver</button>
-              <button type="button" onClick={()=>{ setDraft(''); setClean(''); setDraftTags(''); }}>Annuler</button>
+              <button type="button" onClick={onImprove}>{t("btn.improve")}</button>
+              <button type="button" onClick={onSaveDraft}>{t("btn.save")}</button>
+              <button type="button" onClick={()=>{ setDraft(''); setClean(''); setDraftTags(''); }}>{t("btn.cancel")}</button>
             </div>
           </div>
         )}
@@ -256,31 +274,32 @@ export default function App() {
 
       {/* Liste */}
       <section style={{ marginTop:16 }}>
-        {tasks.length === 0 && <p style={{ color:'#666' }}>Aucune tâche. Dites-la ou tapez-la ✨</p>}
+        {tasks.length === 0 && <p style={{ color:'#666' }}>{t("empty")}</p>}
         <ul style={{ listStyle:'none', padding:0 }}>
-          {tasks.map(t => (
-            <li key={t.id} style={{ borderBottom:'1px solid #eee', padding:'10px 0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          {tasks.map(tk => (
+            <li key={tk.id} style={{ borderBottom:'1px solid #eee', padding:'10px 0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <button
                 type="button"
-                onClick={async ()=>{ await toggleDone(t.id); await refresh(); }}
-                aria-label="toggle" title="Marquer fait/non fait"
+                onClick={async ()=>{ await toggleDone(tk.id); await refresh(); }}
+                aria-label="toggle"
+                title={t("filter.done")}
               >
-                {t.status === 'done' ? '☑' : '☐'}
+                {tk.status === 'done' ? '☑' : '☐'}
               </button>
 
               <div style={{ flex:1, margin:'0 8px' }}>
-                <div style={{ fontWeight:600, textDecoration: t.status==='done'?'line-through':'none' }}>{t.rawText}</div>
-                {t.cleanText && <div style={{ color:'#666' }}>{t.cleanText}</div>}
-                {t.tags && t.tags.length>0 && (
+                <div style={{ fontWeight:600, textDecoration: tk.status==='done'?'line-through':'none' }}>{tk.rawText}</div>
+                {tk.cleanText && <div style={{ color:'#666' }}>{tk.cleanText}</div>}
+                {tk.tags && tk.tags.length>0 && (
                   <div className="chips">
-                    {t.tags.map(tag => <span className="chip" key={tag}>#{tag}</span>)}
+                    {tk.tags.map(tag => <span className="chip" key={tag}>#{tag}</span>)}
                   </div>
                 )}
               </div>
 
               <button
                 type="button"
-                onClick={async ()=>{ await removeTask(t.id); await refresh(); toast('Tâche supprimée', { type:'info' }); }}
+                onClick={async ()=>{ await removeTask(tk.id); await refresh(); toast(t("toast.deleted"), { type:'info' }); }}
                 aria-label="delete"
               >
                 🗑
