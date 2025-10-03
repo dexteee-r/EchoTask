@@ -1,0 +1,7 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#fff; color:#111; }
+button { padding:10px 12px; border-radius:8px; border:1px solid #ccc; background:#f8f8f8; cursor:pointer; }
+button:active { transform: translateY(1px); }
+input, textarea, select { border-radius:8px; border:1px solid #ccc; padding:10px; width:100%; }
+h1, h3 { margin:0; font-weight:700; }
