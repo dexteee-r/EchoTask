@@ -155,7 +155,7 @@ export default function App() {
   const unsupportedSTT = !sttSupported();
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ maxWidth: 980, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
       {/* TOAST HOST */}
       <ToastHost />
 
