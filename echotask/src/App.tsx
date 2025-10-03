@@ -5,7 +5,7 @@ import { sttSupported, startLocalSTT, recordAndTranscribeCloud } from './stt';
 
 // (optionnel) import { useIOSInstallHint } from "./hooks/useInstallPrompt";
 
-const nowIso = () => new Date().toISOString();
+
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -16,6 +16,9 @@ export default function App() {
   const [listeningLocal, setListeningLocal] = useState(false);
   const [listeningCloud, setListeningCloud] = useState(false);
   const stopLocalRef = useRef<null | (()=>void)>(null);
+  const nowIso = () => new Date().toISOString();
+
+
 
   // Privacy / Cloud
   const [allowCloud, setAllowCloud] = useState(() => localStorage.getItem("allowCloud")==="1");
@@ -95,6 +98,7 @@ export default function App() {
       await add(draft.trim(), clean.trim() ? clean.trim() : null);
       setDraft('');
       setClean('');
+      await refresh(); // <-- garantit l’affichage instantané
       alert('Tâche enregistrée ✅');
     } catch (e:any) {
         console.error('SAVE_ERROR', e);
@@ -113,6 +117,13 @@ export default function App() {
     } catch (e) {
       alert('Réécriture indisponible.');
     }
+  }
+
+  async function onSubmitAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!input.trim()) return;
+    await add(input.trim(), null);
+    setInput('');
   }
 
   const unsupportedSTT = !sttSupported();
@@ -149,18 +160,15 @@ export default function App() {
 
       <section style={{ marginTop:16, display:'grid', gap:8 }}>
         <div style={{ display:'flex', gap:8 }}>
-          <input
-            value={input}
-            onChange={e=>setInput(e.target.value)}
-            placeholder="Tape ta tâche…"
-            style={{ flex:1, padding:12, border:'1px solid #ccc', borderRadius:8 }}
-          />
-          <button
-            type="button"
-            onClick={async ()=>{ if (input.trim()) { await add(input.trim(), null); setInput(''); } }}
-          >
-            Ajouter
-          </button>
+          <form onSubmit={onSubmitAdd} style={{ display:'flex', gap:8 }}>
+            <input
+              value={input}
+              onChange={e=>setInput(e.target.value)}
+              placeholder="Tape ta tâche…"
+              style={{ flex:1, padding:12, border:'1px solid #ccc', borderRadius:8 }}
+            />
+            <button type="submit">Ajouter</button>
+          </form>
         </div>
 
         <div style={{ display:'flex', gap:8 }}>
@@ -205,14 +213,27 @@ export default function App() {
         <ul style={{ listStyle:'none', padding:0 }}>
           {tasks.map(t => (
             <li key={t.id} style={{ borderBottom:'1px solid #eee', padding:'10px 0', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <button type="button" onClick={()=>toggleDone(t.id)} aria-label="toggle" title="Marquer fait/non fait">
+              <button
+                type="button"
+                onClick={async ()=>{ await toggleDone(t.id); await refresh(); }}
+                aria-label="toggle"
+                title="Marquer fait/non fait"
+              >
                 {t.status === 'done' ? '☑' : '☐'}
               </button>
+
               <div style={{ flex:1, margin:'0 8px' }}>
                 <div style={{ fontWeight:600, textDecoration: t.status==='done'?'line-through':'none' }}>{t.rawText}</div>
                 {t.cleanText && <div style={{ color:'#666' }}>{t.cleanText}</div>}
               </div>
-              <button type="button" onClick={()=>removeTask(t.id)} aria-label="delete">🗑</button>
+
+              <button
+                type="button"
+                onClick={async ()=>{ await removeTask(t.id); await refresh(); }}
+                aria-label="delete"
+              >
+                🗑
+              </button>
             </li>
           ))}
         </ul>
