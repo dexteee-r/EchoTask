@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { registerSW } from './sw-register';
-import './style.css';
 import { I18nProvider } from './i18n';
+import { ThemeProvider } from './ThemeProvider';  // 🆕 AJOUTER
+import './design-system.css';  // 🆕 AJOUTER (AVANT styles.css)
+import './style.css';
 
-registerSW();
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <I18nProvider>
-    <App />
-  </I18nProvider>
+  <React.StrictMode>
+    <ThemeProvider>  {/* 🆕 ENTOURER I18nProvider */}
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ThemeProvider>  {/* 🆕 FERMER */}
+  </React.StrictMode>
 );

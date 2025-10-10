@@ -1,6 +1,6 @@
-// src/ui/TaskItem.tsx
+// src/ui/TaskItem.tsx (Modernisé)
 import React from 'react';
-import { Task } from '../db';
+import { Task } from '../types';
 
 interface TaskItemProps {
   task: Task;
@@ -11,13 +11,12 @@ interface TaskItemProps {
 }
 
 /**
- * Composant TaskItem - Affiche une tâche individuelle
+ * Composant TaskItem - Affiche une tâche individuelle (Modernisé)
  * 
- * @param task - La tâche à afficher
- * @param onToggleDone - Callback pour marquer fait/non fait
- * @param onDelete - Callback pour supprimer la tâche
- * @param toggleLabel - Libellé pour le bouton toggle (traduction)
- * @param deleteLabel - Libellé optionnel pour le bouton supprimer
+ * Utilise le Design System pour :
+ * - Card avec hover effect
+ * - Transitions douces
+ * - Couleurs cohérentes
  */
 export default function TaskItem({ 
   task, 
@@ -29,15 +28,17 @@ export default function TaskItem({
   
   return (
     <li 
+      className="card fade-in"
       style={{ 
-        borderBottom: '1px solid #eee', 
-        padding: '10px 0', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center' 
+        marginBottom: 'var(--space-3)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 'var(--space-3)',
+        transition: 'all var(--transition-base)',
       }}
     >
-      {/* Bouton toggle fait/non fait */}
+      {/* Bouton toggle */}
       <button
         type="button"
         onClick={() => onToggleDone(task.id)}
@@ -47,34 +48,58 @@ export default function TaskItem({
           cursor: 'pointer',
           background: 'none',
           border: 'none',
-          fontSize: '1.2em'
+          fontSize: '1.5rem',
+          padding: 'var(--space-2)',
+          borderRadius: 'var(--radius-md)',
+          transition: 'all var(--transition-fast)',
+          color: task.status === 'done' ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'var(--color-bg-secondary)';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'none';
+          e.currentTarget.style.transform = 'scale(1)';
         }}
       >
         {task.status === 'done' ? '☑' : '☐'}
       </button>
 
       {/* Contenu de la tâche */}
-      <div style={{ flex: 1, margin: '0 8px' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         {/* Texte brut (rawText) */}
         <div 
           style={{ 
-            fontWeight: 600, 
-            textDecoration: task.status === 'done' ? 'line-through' : 'none' 
+            fontWeight: 'var(--font-semibold)',
+            fontSize: 'var(--text-base)',
+            color: 'var(--color-text)',
+            textDecoration: task.status === 'done' ? 'line-through' : 'none',
+            opacity: task.status === 'done' ? 0.6 : 1,
+            marginBottom: task.cleanText ? 'var(--space-1)' : 0,
+            transition: 'all var(--transition-base)',
           }}
         >
           {task.rawText}
         </div>
 
-        {/* Texte amélioré (cleanText) si présent */}
+        {/* Texte amélioré (cleanText) */}
         {task.cleanText && (
-          <div style={{ color: '#666', marginTop: 4 }}>
+          <div 
+            style={{ 
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-secondary)',
+              marginTop: 'var(--space-1)',
+              lineHeight: 'var(--leading-relaxed)',
+            }}
+          >
             {task.cleanText}
           </div>
         )}
 
         {/* Tags */}
         {task.tags && task.tags.length > 0 && (
-          <div className="chips" style={{ marginTop: 6 }}>
+          <div className="chips" style={{ marginTop: 'var(--space-2)' }}>
             {task.tags.map(tag => (
               <span className="chip" key={tag}>
                 #{tag}
@@ -93,7 +118,21 @@ export default function TaskItem({
           cursor: 'pointer',
           background: 'none',
           border: 'none',
-          fontSize: '1.2em'
+          fontSize: '1.25rem',
+          padding: 'var(--space-2)',
+          borderRadius: 'var(--radius-md)',
+          transition: 'all var(--transition-fast)',
+          color: 'var(--color-text-tertiary)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'var(--color-error-light)';
+          e.currentTarget.style.color = 'var(--color-error)';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'none';
+          e.currentTarget.style.color = 'var(--color-text-tertiary)';
+          e.currentTarget.style.transform = 'scale(1)';
         }}
       >
         {deleteLabel}

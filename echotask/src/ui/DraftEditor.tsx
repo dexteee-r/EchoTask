@@ -1,4 +1,4 @@
-// src/ui/DraftEditor.tsx
+// src/ui/DraftEditor.tsx (Modernisé)
 import React from 'react';
 
 interface DraftEditorProps {
@@ -11,7 +11,6 @@ interface DraftEditorProps {
   onImprove: () => void;
   onSave: () => void;
   onCancel: () => void;
-  // Labels traduits
   title: string;
   rawLabel: string;
   cleanLabel: string;
@@ -22,30 +21,12 @@ interface DraftEditorProps {
 }
 
 /**
- * Composant DraftEditor
+ * Composant DraftEditor - Édition du brouillon (Modernisé)
  * 
- * Affiche et édite le brouillon de tâche issu de la dictée vocale :
- * - Texte brut (rawText)
- * - Texte amélioré (cleanText)
- * - Tags
- * - Actions : Améliorer, Sauvegarder, Annuler
- * 
- * @param draft - Texte brut du brouillon
- * @param clean - Texte amélioré
- * @param tags - Tags (séparés par virgules)
- * @param onDraftChange - Callback changement texte brut
- * @param onCleanChange - Callback changement texte amélioré
- * @param onTagsChange - Callback changement tags
- * @param onImprove - Callback amélioration
- * @param onSave - Callback sauvegarde
- * @param onCancel - Callback annulation
- * @param title - Titre de la section (traduit)
- * @param rawLabel - Label texte brut (traduit)
- * @param cleanLabel - Label texte amélioré (traduit)
- * @param tagsPlaceholder - Placeholder tags (traduit)
- * @param improveLabel - Label bouton améliorer (traduit)
- * @param saveLabel - Label bouton sauvegarder (traduit)
- * @param cancelLabel - Label bouton annuler (traduit)
+ * Utilise le Design System pour :
+ * - Card avec ombre élégante
+ * - Textareas stylées
+ * - Boutons avec icônes
  */
 export default function DraftEditor({
   draft,
@@ -67,116 +48,107 @@ export default function DraftEditor({
 }: DraftEditorProps) {
   
   return (
-    <div style={{ 
-      border: '1px solid #eee', 
-      borderRadius: 8, 
-      padding: 12, 
-      marginTop: 16,
-      backgroundColor: '#f9f9f9'
-    }}>
+    <div 
+      className="card slide-in"
+      style={{ 
+        marginTop: 'var(--space-4)',
+        background: 'var(--color-surface)',
+        border: '2px solid var(--color-primary-light)',
+      }}
+    >
       {/* Titre */}
-      <h3 style={{ marginTop: 0, marginBottom: 12 }}>
+      <h3 style={{ 
+        marginTop: 0, 
+        marginBottom: 'var(--space-3)',
+        color: 'var(--color-text)',
+        fontSize: 'var(--text-lg)',
+        fontWeight: 'var(--font-semibold)',
+      }}>
         {title}
       </h3>
 
       {/* Texte brut */}
       <label style={{ 
         display: 'block', 
-        fontWeight: 600, 
-        marginBottom: 4,
-        fontSize: '0.9em'
+        fontWeight: 'var(--font-medium)',
+        marginBottom: 'var(--space-1)',
+        fontSize: 'var(--text-sm)',
+        color: 'var(--color-text-secondary)',
       }}>
         {rawLabel}
       </label>
       <textarea
+        className="input"
         value={draft}
         onChange={e => onDraftChange(e.target.value)}
         rows={3}
         style={{ 
-          width: '100%', 
-          padding: 8,
-          border: '1px solid #ddd',
-          borderRadius: 4,
-          fontFamily: 'inherit',
-          fontSize: '1em',
-          resize: 'vertical'
+          width: '100%',
+          resize: 'vertical',
+          fontFamily: 'var(--font-family)',
         }}
       />
 
       {/* Texte amélioré */}
       <label style={{ 
         display: 'block', 
-        fontWeight: 600, 
-        marginTop: 12,
-        marginBottom: 4,
-        fontSize: '0.9em'
+        fontWeight: 'var(--font-medium)',
+        marginTop: 'var(--space-3)',
+        marginBottom: 'var(--space-1)',
+        fontSize: 'var(--text-sm)',
+        color: 'var(--color-text-secondary)',
       }}>
         {cleanLabel}
       </label>
       <textarea
+        className="input"
         value={clean}
         onChange={e => onCleanChange(e.target.value)}
         rows={3}
         style={{ 
-          width: '100%', 
-          padding: 8,
-          border: '1px solid #ddd',
-          borderRadius: 4,
-          fontFamily: 'inherit',
-          fontSize: '1em',
-          resize: 'vertical'
+          width: '100%',
+          resize: 'vertical',
+          fontFamily: 'var(--font-family)',
         }}
       />
 
       {/* Tags */}
       <input
+        className="input"
         value={tags}
         onChange={e => onTagsChange(e.target.value)}
         placeholder={tagsPlaceholder}
-        style={{ 
-          width: '100%',
-          marginTop: 12, 
-          padding: 10, 
-          border: '1px solid #ddd', 
-          borderRadius: 8,
-          fontSize: '0.95em'
-        }}
+        style={{ marginTop: 'var(--space-3)' }}
       />
 
       {/* Actions */}
       <div style={{ 
         display: 'flex', 
-        gap: 8, 
-        marginTop: 12,
-        flexWrap: 'wrap'
+        gap: 'var(--space-2)',
+        marginTop: 'var(--space-3)',
+        flexWrap: 'wrap',
       }}>
         <button 
           type="button" 
           onClick={onImprove}
-          style={{
-            flex: '1 1 auto',
-            minWidth: 100
-          }}
+          className="btn btn-primary"
+          style={{ flex: '1 1 auto', minWidth: 100 }}
         >
           ✨ {improveLabel}
         </button>
         <button 
           type="button" 
           onClick={onSave}
-          style={{
-            flex: '1 1 auto',
-            minWidth: 100
-          }}
+          className="btn btn-primary"
+          style={{ flex: '1 1 auto', minWidth: 100 }}
         >
           💾 {saveLabel}
         </button>
         <button 
           type="button" 
           onClick={onCancel}
-          style={{
-            flex: '1 1 auto',
-            minWidth: 100
-          }}
+          className="btn btn-ghost"
+          style={{ flex: '1 1 auto', minWidth: 100 }}
         >
           ❌ {cancelLabel}
         </button>

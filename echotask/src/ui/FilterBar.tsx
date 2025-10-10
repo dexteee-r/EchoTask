@@ -1,4 +1,4 @@
-// src/ui/FilterBar.tsx
+// src/ui/FilterBar.tsx (Modernisé)
 import React from 'react';
 
 interface FilterBarProps {
@@ -11,18 +11,12 @@ interface FilterBarProps {
 }
 
 /**
- * Composant FilterBar
+ * Composant FilterBar - Recherche et filtrage (Modernisé)
  * 
- * Barre de recherche et filtrage :
- * - Recherche texte (dans rawText et cleanText)
- * - Filtre par tags (multi-tags séparés par virgules)
- * 
- * @param search - Valeur de la recherche texte
- * @param tagFilter - Valeur du filtre tags
- * @param onSearchChange - Callback changement recherche
- * @param onTagFilterChange - Callback changement filtre tags
- * @param searchPlaceholder - Placeholder recherche (traduit)
- * @param tagFilterPlaceholder - Placeholder filtre tags (traduit)
+ * Utilise le Design System pour :
+ * - Inputs avec focus states
+ * - Icônes de recherche
+ * - Grid layout responsive
  */
 export default function FilterBar({
   search,
@@ -35,41 +29,57 @@ export default function FilterBar({
   
   return (
     <div style={{ 
-      marginTop: 12, 
+      marginTop: 'var(--space-3)', 
       display: 'grid', 
-      gap: 8 
+      gap: 'var(--space-2)',
     }}>
       {/* Recherche texte */}
-      <input
-        type="text"
-        value={search}
-        onChange={e => onSearchChange(e.target.value)}
-        placeholder={searchPlaceholder}
-        style={{ 
-          padding: 12, 
-          border: '1px solid #ccc', 
-          borderRadius: 8,
-          fontSize: '1em',
-          width: '100%'
-        }}
-        aria-label="Recherche"
-      />
+      <div style={{ position: 'relative' }}>
+        <span style={{
+          position: 'absolute',
+          left: 'var(--space-3)',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          fontSize: '1.25rem',
+          pointerEvents: 'none',
+          opacity: 0.5,
+        }}>
+          🔍
+        </span>
+        <input
+          type="text"
+          className="input"
+          value={search}
+          onChange={e => onSearchChange(e.target.value)}
+          placeholder={searchPlaceholder}
+          style={{ paddingLeft: 'calc(var(--space-3) + 1.5rem)' }}
+          aria-label="Recherche"
+        />
+      </div>
 
       {/* Filtre tags */}
-      <input
-        type="text"
-        value={tagFilter}
-        onChange={e => onTagFilterChange(e.target.value)}
-        placeholder={tagFilterPlaceholder}
-        style={{ 
-          padding: 12, 
-          border: '1px solid #ccc', 
-          borderRadius: 8,
-          fontSize: '1em',
-          width: '100%'
-        }}
-        aria-label="Filtre par tags"
-      />
+      <div style={{ position: 'relative' }}>
+        <span style={{
+          position: 'absolute',
+          left: 'var(--space-3)',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          fontSize: '1.25rem',
+          pointerEvents: 'none',
+          opacity: 0.5,
+        }}>
+          🏷️
+        </span>
+        <input
+          type="text"
+          className="input"
+          value={tagFilter}
+          onChange={e => onTagFilterChange(e.target.value)}
+          placeholder={tagFilterPlaceholder}
+          style={{ paddingLeft: 'calc(var(--space-3) + 1.5rem)' }}
+          aria-label="Filtre par tags"
+        />
+      </div>
     </div>
   );
 }
