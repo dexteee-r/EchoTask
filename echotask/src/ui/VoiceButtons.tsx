@@ -1,4 +1,4 @@
-// src/ui/VoiceButtons.tsx
+// src/ui/VoiceButtons.tsx (Modernisé)
 import React from 'react';
 
 interface VoiceButtonsProps {
@@ -15,26 +15,12 @@ interface VoiceButtonsProps {
 }
 
 /**
- * Composant VoiceButtons
+ * Composant VoiceButtons - Boutons de dictée (Modernisé)
  * 
- * Boutons de dictée vocale :
- * - Bouton micro local (Web Speech API)
- * - Bouton micro cloud (Whisper API)
- * - Indicateur d'écoute (●)
- * - Désactivation si non supporté
- * 
- * Utilisation : Press & Hold (maintenir appuyé)
- * 
- * @param listeningLocal - État écoute locale
- * @param listeningCloud - État écoute cloud
- * @param sttSupported - Web Speech supporté ?
- * @param onStartLocal - Callback démarrage local
- * @param onStopLocal - Callback arrêt local
- * @param onStartCloud - Callback démarrage cloud
- * @param onStopCloud - Callback arrêt cloud
- * @param localLabel - Label bouton local (traduit)
- * @param cloudLabel - Label bouton cloud (traduit)
- * @param unsupportedTooltip - Tooltip si non supporté (traduit)
+ * Utilise le Design System pour :
+ * - Boutons stylés avec états
+ * - Animation pulse pendant l'écoute
+ * - Feedback visuel clair
  */
 export default function VoiceButtons({
   listeningLocal,
@@ -50,7 +36,12 @@ export default function VoiceButtons({
 }: VoiceButtonsProps) {
   
   return (
-    <div className="input-row" style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+    <div style={{ 
+      marginTop: 'var(--space-2)', 
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--space-2)',
+    }}>
       {/* Bouton micro local */}
       <button
         type="button"
@@ -58,20 +49,27 @@ export default function VoiceButtons({
         onPointerUp={onStopLocal}
         disabled={!sttSupported}
         title={!sttSupported ? unsupportedTooltip : localLabel}
+        className="btn"
         style={{
-          flex: 1,
-          padding: '10px 16px',
-          borderRadius: 8,
-          border: '1px solid #ccc',
-          backgroundColor: listeningLocal ? '#ffebee' : '#fff',
-          cursor: sttSupported ? 'pointer' : 'not-allowed',
+          background: listeningLocal ? 'var(--color-error)' : 'var(--color-surface)',
+          color: listeningLocal ? 'white' : 'var(--color-text)',
+          border: `2px solid ${listeningLocal ? 'var(--color-error)' : 'var(--color-border)'}`,
           opacity: sttSupported ? 1 : 0.5,
-          fontWeight: 600,
-          fontSize: '0.95em',
-          transition: 'background-color 0.2s'
+          cursor: sttSupported ? 'pointer' : 'not-allowed',
+          fontWeight: 'var(--font-semibold)',
+          position: 'relative',
+          animation: listeningLocal ? 'pulse 1.5s ease-in-out infinite' : 'none',
         }}
       >
-        🎤 {localLabel} {listeningLocal ? '●' : ''}
+        🎤 {localLabel} {listeningLocal && <span style={{
+          display: 'inline-block',
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          background: 'white',
+          marginLeft: 'var(--space-1)',
+          animation: 'pulse 1s ease-in-out infinite',
+        }} />}
       </button>
 
       {/* Bouton micro cloud */}
@@ -80,19 +78,25 @@ export default function VoiceButtons({
         onPointerDown={onStartCloud}
         onPointerUp={onStopCloud}
         title={cloudLabel}
+        className="btn"
         style={{
-          flex: 1,
-          padding: '10px 16px',
-          borderRadius: 8,
-          border: '1px solid #ccc',
-          backgroundColor: listeningCloud ? '#e3f2fd' : '#fff',
+          background: listeningCloud ? 'var(--color-primary)' : 'var(--color-surface)',
+          color: listeningCloud ? 'white' : 'var(--color-text)',
+          border: `2px solid ${listeningCloud ? 'var(--color-primary)' : 'var(--color-border)'}`,
           cursor: 'pointer',
-          fontWeight: 600,
-          fontSize: '0.95em',
-          transition: 'background-color 0.2s'
+          fontWeight: 'var(--font-semibold)',
+          animation: listeningCloud ? 'pulse 1.5s ease-in-out infinite' : 'none',
         }}
       >
-        ☁️ {cloudLabel} {listeningCloud ? '●' : ''}
+        ☁️ {cloudLabel} {listeningCloud && <span style={{
+          display: 'inline-block',
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          background: 'white',
+          marginLeft: 'var(--space-1)',
+          animation: 'pulse 1s ease-in-out infinite',
+        }} />}
       </button>
     </div>
   );

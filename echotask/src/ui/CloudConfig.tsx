@@ -1,4 +1,4 @@
-// src/ui/CloudConfig.tsx
+// src/ui/CloudConfig.tsx (Modernisé)
 import React from 'react';
 
 interface CloudConfigProps {
@@ -13,21 +13,12 @@ interface CloudConfigProps {
 }
 
 /**
- * Composant CloudConfig
+ * Composant CloudConfig - Configuration Cloud (Modernisé)
  * 
- * Section de configuration Cloud :
- * - Toggle Cloud ON/OFF
- * - Champ API key (visible si Cloud activé)
- * - Message d'avertissement si Cloud activé sans clé
- * 
- * @param allowCloud - État du Cloud (activé/désactivé)
- * @param apiKey - Clé API OpenAI
- * @param onToggleCloud - Callback toggle Cloud
- * @param onApiKeyChange - Callback changement API key
- * @param cloudOnLabel - Label "Cloud: ON" (traduit)
- * @param cloudOffLabel - Label "Cloud: OFF" (traduit)
- * @param apiKeyPlaceholder - Placeholder clé API (traduit)
- * @param warningMessage - Message d'avertissement (traduit)
+ * Utilise le Design System pour :
+ * - Badge toggle stylé
+ * - Input avec validation visuelle
+ * - Message d'avertissement coloré
  */
 export default function CloudConfig({
   allowCloud,
@@ -49,47 +40,63 @@ export default function CloudConfig({
         className="badge"
         style={{
           cursor: 'pointer',
-          padding: '6px 12px',
-          borderRadius: 4,
-          border: '1px solid #ccc',
-          backgroundColor: allowCloud ? '#e3f2fd' : '#f5f5f5',
-          fontWeight: 600
+          background: allowCloud ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+          color: allowCloud ? 'white' : 'var(--color-text-secondary)',
+          fontWeight: 'var(--font-semibold)',
+          transition: 'all var(--transition-fast)',
         }}
       >
-        {allowCloud ? cloudOnLabel : cloudOffLabel}
+        {allowCloud ? '☁️ ' + cloudOnLabel : '🔒 ' + cloudOffLabel}
       </button>
 
       {/* Section API Key (visible si Cloud activé) */}
       {allowCloud && (
-        <div style={{ marginTop: 8 }}>
+        <div 
+          className="card fade-in"
+          style={{ 
+            marginTop: 'var(--space-2)',
+            padding: 'var(--space-3)',
+            position: 'absolute',
+            zIndex: 'var(--z-dropdown)',
+            minWidth: 300,
+            maxWidth: 400,
+          }}
+        >
+          <label style={{
+            display: 'block',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 'var(--font-medium)',
+            color: 'var(--color-text-secondary)',
+            marginBottom: 'var(--space-1)',
+          }}>
+            🔑 {apiKeyPlaceholder}
+          </label>
           <input
             type="password"
-            placeholder={apiKeyPlaceholder}
+            className="input"
+            placeholder="sk-..."
             value={apiKey}
             onChange={e => onApiKeyChange(e.target.value)}
             style={{
-              width: '100%',
-              padding: 8,
-              borderColor: !apiKey && allowCloud ? '#b00020' : '#ccc',
-              borderWidth: 1,
-              borderStyle: 'solid',
-              borderRadius: 8,
-              fontSize: '0.95em'
+              borderColor: !apiKey ? 'var(--color-error)' : 'var(--color-border)',
             }}
             aria-label="Clé API OpenAI"
           />
           
           {/* Avertissement si pas de clé */}
-          {allowCloud && !apiKey && (
+          {!apiKey && (
             <div style={{ 
-              color: '#b00020', 
-              marginTop: 4,
-              fontSize: '0.9em',
+              marginTop: 'var(--space-2)',
+              padding: 'var(--space-2)',
+              background: 'var(--color-error-light)',
+              color: 'var(--color-error)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-sm)',
               display: 'flex',
               alignItems: 'center',
-              gap: 4
+              gap: 'var(--space-2)',
             }}>
-              ⚠️ {warningMessage}
+              ⚠️ <span>{warningMessage}</span>
             </div>
           )}
         </div>
