@@ -8,6 +8,7 @@ import FilterBar from './ui/FilterBar';
 import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
 import DraftEditor from './ui/DraftEditor';
+import ThemeToggle from './ui/ThemeToggle';  
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
 import { useDraft } from './hooks/useDraft';
@@ -132,7 +133,7 @@ export default function App() {
             apiKeyPlaceholder={t("api.key.placeholder")}
             warningMessage={t("api.key.placeholder")}
           />
-
+          <ThemeToggle />
           <LanguageSwitch />
         </div>
       </header>
