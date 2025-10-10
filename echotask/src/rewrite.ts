@@ -1,21 +1,54 @@
+// src/rewrite.ts
+import { RewriteTone } from './types';
+import { API_URLS, REWRITE_CONFIG } from './constants';
+import { cleanSpaces, capitalize, ensurePunctuation } from './utils';
+
+/**
+ * Réécriture locale simple
+ * - Nettoie les espaces multiples
+ * - Capitalise la première lettre
+ * - Ajoute une ponctuation finale si absente
+ */
 export function localRewrite(raw: string): string {
-  const t = raw.trim().replace(/\s+/g, ' ');
-  if (!t) return '';
-  const cap = t.charAt(0).toUpperCase() + t.slice(1);
-  return /[.!?…]$/.test(cap) ? cap : cap + '.';
+  const cleaned = cleanSpaces(raw);
+  if (!cleaned) return '';
+  const capitalized = capitalize(cleaned);
+  return ensurePunctuation(capitalized);
 }
 
-export async function cloudRewrite(raw: string, apiKey: string, lang='fr', tone='neutral') {
-  const system = `Reformule des mémos en phrases claires et actionnables. Langue: ${lang}. Ton: ${tone}. Ne renvoie que la phrase.`;
-  const r = await fetch('https://api.openai.com/v1/chat/completions', {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${apiKey}` },
+/**
+ * Réécriture cloud via GPT-4
+ * 
+ * @param raw - Texte brut à réécrire
+ * @param apiKey - Clé API OpenAI
+ * @param lang - Langue cible (fr/en/ar)
+ * @param tone - Ton de réécriture (neutral/professional/friendly/casual)
+ * @returns {Promise<string>} Texte réécrit
+ */
+export async function cloudRewrite(
+  raw: string, 
+  apiKey: string, 
+  lang: string = 'fr', 
+  tone: RewriteTone = 'neutral'
+): Promise<string> {
+  const system = REWRITE_CONFIG.DEFAULT_SYSTEM_PROMPT(lang, tone);
+  
+  const r = await fetch(API_URLS.CHAT, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${apiKey}` 
+    },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      temperature: 0.2,
-      messages: [{ role:'system', content: system }, { role:'user', content: raw }]
+      model: REWRITE_CONFIG.MODEL,
+      temperature: REWRITE_CONFIG.TEMPERATURE,
+      messages: [
+        { role: 'system', content: system }, 
+        { role: 'user', content: raw }
+      ]
     })
   });
+  
   if (!r.ok) throw new Error('Rewrite cloud error');
   const j = await r.json();
   return j.choices?.[0]?.message?.content?.trim() ?? '';

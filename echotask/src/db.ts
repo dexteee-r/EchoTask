@@ -1,16 +1,8 @@
 // src/db.ts
 import Dexie, { Table } from 'dexie';
-
-export type Task = {
-  id: string;
-  rawText: string;
-  cleanText?: string | null;
-  status: 'active' | 'done';
-  tags?: string[];
-  due?: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+import { Task, TaskFilter } from './types';
+import { STORAGE_KEYS, APP_CONFIG, SEPARATORS } from './constants';
+import { nowIso, shortId } from './utils';
 
 /** ID safe: marche même sans crypto.randomUUID (HTTP, iOS PWA) */
 export function safeId(): string {
@@ -18,7 +10,7 @@ export function safeId(): string {
     // @ts-ignore
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   } catch {}
-  return 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  return SEPARATORS.ID_PREFIX + shortId();
 }
 
 /** Détecte si IndexedDB est disponible (pas en Private mode iOS < 16, etc.) */
@@ -30,20 +22,19 @@ function hasIndexedDB(): boolean {
 class EchoTaskDB extends Dexie {
   tasks!: Table<Task, string>;
   constructor() {
-    super('echotask');
+    super(APP_CONFIG.DB_NAME);
     // index sur id, status, createdAt
-    this.version(1).stores({ tasks: 'id, status, createdAt' });
+    this.version(APP_CONFIG.DB_VERSION).stores({ tasks: 'id, status, createdAt' });
   }
 }
 const db = hasIndexedDB() ? new EchoTaskDB() : null;
 
 /** --- Fallback localStorage --- */
-const LS_KEY = 'echotask_tasks';
 function lsRead(): Task[] {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]'); } catch { return []; }
 }
 function lsWrite(arr: Task[]) {
-  localStorage.setItem(LS_KEY, JSON.stringify(arr));
+  localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(arr));
 }
 
 /** API unifiée (utilise Dexie si dispo, sinon localStorage) */
@@ -52,7 +43,7 @@ export async function createTask(t: Task): Promise<void> {
   const arr = lsRead(); arr.unshift(t); lsWrite(arr);
 }
 
-export async function listTasks(filter: 'all'|'active'|'done'='all'): Promise<Task[]> {
+export async function listTasks(filter: TaskFilter = 'all'): Promise<Task[]> {
   if (db) {
     if (filter === 'all') return db.tasks.toArray().then(a => a.sort((b,c)=> c.createdAt.localeCompare(b.createdAt)));
     const a = await db.tasks.where('status').equals(filter).toArray();
@@ -66,11 +57,11 @@ export async function toggleDone(id: string): Promise<void> {
   if (db) {
     const t = await db.tasks.get(id); if (!t) return;
     const next = t.status === 'done' ? 'active' : 'done';
-    return db.tasks.update(id, { status: next, updatedAt: new Date().toISOString() });
+    return db.tasks.update(id, { status: next, updatedAt: nowIso() });
   }
   const arr = lsRead();
   const i = arr.findIndex(x => x.id === id);
-  if (i >= 0) { arr[i].status = arr[i].status==='done'?'active':'done'; arr[i].updatedAt = new Date().toISOString(); }
+  if (i >= 0) { arr[i].status = arr[i].status==='done'?'active':'done'; arr[i].updatedAt = nowIso(); }
   lsWrite(arr);
 }
 
