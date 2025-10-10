@@ -1,4 +1,5 @@
 // src/stt.ts
+import { API_URLS, WHISPER_CONFIG, STT_CONFIG } from './constants';
 
 export type SttOpts = { language?: string; allowCloud?: boolean; whisperApiKey?: string };
 
@@ -12,7 +13,7 @@ export function sttSupported(): boolean {
 
 /**
  * STT local via Web Speech API
- * Renvoie une fonction stop() pour arrêter l’écoute.
+ * Renvoie une fonction stop() pour arrêter l'écoute.
  */
 export function startLocalSTT(
   onResult: (text: string) => void,
@@ -22,8 +23,8 @@ export function startLocalSTT(
   if (!SpeechRec) throw new Error('STT non supporté');
   const rec = new SpeechRec();
   rec.lang = lang;
-  rec.interimResults = true;
-  rec.continuous = true;
+  rec.interimResults = STT_CONFIG.INTERIM_RESULTS;
+  rec.continuous = STT_CONFIG.CONTINUOUS;
 
   let finalText = '';
   let raf = 0;
@@ -62,7 +63,7 @@ export async function recordAndTranscribeCloud(
 
   const done = new Promise<Blob>((resolve) => {
     mr.ondataavailable = (e) => chunks.push(e.data);
-    mr.onstop = () => resolve(new Blob(chunks, { type: 'audio/webm' }));
+    mr.onstop = () => resolve(new Blob(chunks, { type: WHISPER_CONFIG.AUDIO_FORMAT }));
   });
 
   mr.start();
@@ -74,11 +75,11 @@ export async function recordAndTranscribeCloud(
       const blob = await done;
 
       const fd = new FormData();
-      fd.append('file', blob, 'audio.webm');
-      fd.append('model', 'whisper-1');
+      fd.append('file', blob, WHISPER_CONFIG.AUDIO_FILENAME);
+      fd.append('model', WHISPER_CONFIG.MODEL);
       fd.append('language', language);
 
-      const r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      const r = await fetch(API_URLS.WHISPER, {
         method: 'POST',
         headers: { Authorization: `Bearer ${whisperApiKey}` },
         body: fd,
