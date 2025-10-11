@@ -9,16 +9,12 @@ import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
 import DraftEditor from './ui/DraftEditor';
 import ThemeToggle from './ui/ThemeToggle';  
+import WelcomeModal from './ui/WelcomeModal';  
+import EmptyState from './ui/EmptyState';      
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
 import { useDraft } from './hooks/useDraft';
 
-/**
- * Composant principal EchoTask (Ultra-Simplifié)
- * 
- * Orchestration pure via hooks et composants dédiés.
- * Réduit de 315 → ~100 lignes.
- */
 export default function App() {
   // i18n
   const { t, lang } = useI18n();
@@ -31,6 +27,14 @@ export default function App() {
   const [apiKey, setApiKey] = useState(() => 
     localStorage.getItem("apiKey") || ""
   );
+
+  const [showWelcome, setShowWelcome] = useState(() => {
+    return !localStorage.getItem('hasVisited');
+  });
+  const handleCloseWelcome = () => {
+    setShowWelcome(false);
+    localStorage.setItem('hasVisited', 'true');
+  };
 
   useEffect(() => {
     localStorage.setItem("allowCloud", allowCloud ? "1" : "0");
@@ -192,7 +196,7 @@ export default function App() {
         />
       )}
 
-      {/* Liste */}
+      {/* === Liste des tâches === */}
       <TaskList
         tasks={manager.tasks}
         onToggleDone={handleToggleDone}
@@ -200,6 +204,30 @@ export default function App() {
         emptyMessage={t("empty")}
         toggleLabel={t("filter.done")}
       />
+
+      {/* 🆕 Empty State (si liste vide) */}
+      {manager.tasks.length === 0 && (
+        <EmptyState
+          title={t("empty.title")}
+          microphoneHint={t("empty.microphoneHint")}
+          keyboardHint={t("empty.keyboardHint")}
+          improveHint={t("empty.improveHint")}
+        />
+      )}
+
+      {/* 🆕 Welcome Modal (première visite) */}
+      {showWelcome && (
+        <WelcomeModal
+          onClose={handleCloseWelcome}
+          title={t("welcome.title")}
+          subtitle={t("welcome.subtitle")}
+          step1={t("welcome.step1")}
+          step2={t("welcome.step2")}
+          step3={t("welcome.step3")}
+          startButton={t("welcome.start")}
+          learnMoreButton={t("welcome.learnMore")}
+        />
+      )}
     </div>
   );
 }
