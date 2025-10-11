@@ -1,4 +1,4 @@
-// src/ui/TaskItem.tsx (Modernisé)
+// src/ui/TaskItem.tsx (Version Complète avec Édition)
 import React from 'react';
 import { Task } from '../types';
 
@@ -6,23 +6,19 @@ interface TaskItemProps {
   task: Task;
   onToggleDone: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
   toggleLabel: string;
+  editLabel?: string;
   deleteLabel?: string;
 }
 
-/**
- * Composant TaskItem - Affiche une tâche individuelle (Modernisé)
- * 
- * Utilise le Design System pour :
- * - Card avec hover effect
- * - Transitions douces
- * - Couleurs cohérentes
- */
 export default function TaskItem({ 
   task, 
   onToggleDone, 
-  onDelete, 
+  onDelete,
+  onEdit,
   toggleLabel,
+  editLabel = "✏️",
   deleteLabel = "🗑"
 }: TaskItemProps) {
   
@@ -68,7 +64,6 @@ export default function TaskItem({
 
       {/* Contenu de la tâche */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Texte brut (rawText) */}
         <div 
           style={{ 
             fontWeight: 'var(--font-semibold)',
@@ -83,7 +78,6 @@ export default function TaskItem({
           {task.rawText}
         </div>
 
-        {/* Texte amélioré (cleanText) */}
         {task.cleanText && (
           <div 
             style={{ 
@@ -97,7 +91,6 @@ export default function TaskItem({
           </div>
         )}
 
-        {/* Tags */}
         {task.tags && task.tags.length > 0 && (
           <div className="chips" style={{ marginTop: 'var(--space-2)' }}>
             {task.tags.map(tag => (
@@ -108,6 +101,35 @@ export default function TaskItem({
           </div>
         )}
       </div>
+
+      {/* Bouton éditer */}
+      <button
+        type="button"
+        onClick={() => onEdit(task.id)}
+        aria-label="edit"
+        style={{ 
+          cursor: 'pointer',
+          background: 'none',
+          border: 'none',
+          fontSize: '1.25rem',
+          padding: 'var(--space-2)',
+          borderRadius: 'var(--radius-md)',
+          transition: 'all var(--transition-fast)',
+          color: 'var(--color-text-tertiary)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'var(--color-primary-light)';
+          e.currentTarget.style.color = 'var(--color-primary)';
+          e.currentTarget.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'none';
+          e.currentTarget.style.color = 'var(--color-text-tertiary)';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+      >
+        {editLabel}
+      </button>
 
       {/* Bouton supprimer */}
       <button

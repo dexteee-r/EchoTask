@@ -1,6 +1,7 @@
 // src/hooks/useTaskManager.ts
 import { useEffect, useState } from 'react';
-import { createTask, listTasks, removeTask, toggleDone, Task, safeId } from '../db';
+import { createTask, listTasks, removeTask, toggleDone, updateTask, safeId } from '../db';
+import { Task } from '../types';
 
 /**
  * Utilitaire : génère un ISO timestamp
@@ -118,6 +119,14 @@ export function useTaskManager() {
     await refresh();
   }
 
+  /**
+  * Met à jour une tâche existante
+  */
+  async function update(task: Task) {
+    await updateTask(task);
+    await refresh();
+  }
+
   // API publique du hook
   return {
     // État
@@ -135,6 +144,7 @@ export function useTaskManager() {
     add,
     toggle,
     remove,
+    update,
     refresh
   };
 }

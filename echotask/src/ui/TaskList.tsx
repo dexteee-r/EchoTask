@@ -1,12 +1,13 @@
 // src/ui/TaskList.tsx
 import React from 'react';
-import { Task } from '../db';
+import { Task } from '../types';
 import TaskItem from './TaskItem';
 
 interface TaskListProps {
   tasks: Task[];
   onToggleDone: (id: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (id: string) => void; 
   emptyMessage: string;
   toggleLabel: string;
 }
@@ -28,7 +29,8 @@ interface TaskListProps {
 export default function TaskList({ 
   tasks, 
   onToggleDone, 
-  onDelete, 
+  onDelete,
+  onEdit, 
   emptyMessage, 
   toggleLabel 
 }: TaskListProps) {
@@ -51,6 +53,7 @@ export default function TaskList({
             task={task}
             onToggleDone={onToggleDone}
             onDelete={onDelete}
+            onEdit={onEdit}
             toggleLabel={toggleLabel}
           />
         ))}

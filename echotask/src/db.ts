@@ -39,8 +39,13 @@ function lsWrite(arr: Task[]) {
 
 /** API unifiée (utilise Dexie si dispo, sinon localStorage) */
 export async function createTask(t: Task): Promise<void> {
-  if (db) return db.tasks.add(t);
-  const arr = lsRead(); arr.unshift(t); lsWrite(arr);
+  if (db) {
+    await db.tasks.add(t);
+    return;
+  }
+  const arr = lsRead(); 
+  arr.unshift(t); 
+  lsWrite(arr);
 }
 
 export async function listTasks(filter: TaskFilter = 'all'): Promise<Task[]> {
@@ -55,9 +60,11 @@ export async function listTasks(filter: TaskFilter = 'all'): Promise<Task[]> {
 
 export async function toggleDone(id: string): Promise<void> {
   if (db) {
-    const t = await db.tasks.get(id); if (!t) return;
+    const t = await db.tasks.get(id); 
+    if (!t) return;
     const next = t.status === 'done' ? 'active' : 'done';
-    return db.tasks.update(id, { status: next, updatedAt: nowIso() });
+    await db.tasks.update(id, { status: next, updatedAt: nowIso() });
+    return;
   }
   const arr = lsRead();
   const i = arr.findIndex(x => x.id === id);
@@ -66,15 +73,24 @@ export async function toggleDone(id: string): Promise<void> {
 }
 
 export async function removeTask(id: string): Promise<void> {
-  if (db) return db.tasks.delete(id);
+  if (db) {
+    await db.tasks.delete(id);
+    return;
+  }
   lsWrite(lsRead().filter(t => t.id !== id));
 }
 
 export async function updateTask(t: Task): Promise<void> {
-  if (db) return db.tasks.put(t);
+  if (db) {
+    await db.tasks.put(t);
+    return;
+  }
   const arr = lsRead();
   const i = arr.findIndex(x => x.id === t.id);
-  if (i >= 0) { arr[i] = t; lsWrite(arr); }
+  if (i >= 0) { 
+    arr[i] = t; 
+    lsWrite(arr); 
+  }
 }
 
 /** Export / Import JSON (compatible Dexie et LS) */

@@ -1,4 +1,4 @@
-const CACHE = "echotask-v22";
+const CACHE = "echotask-v24";
 const ASSETS = [ "/", "/index.html", "/manifest.webmanifest" ];
 
 // install
