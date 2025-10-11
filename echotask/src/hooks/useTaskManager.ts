@@ -1,6 +1,7 @@
 // src/hooks/useTaskManager.ts
 import { useEffect, useState } from 'react';
-import { createTask, listTasks, removeTask, toggleDone, updateTask, Task, safeId } from '../db';
+import { createTask, listTasks, removeTask, toggleDone, updateTask, safeId } from '../db';
+import { Task } from '../types';
 
 /**
  * Utilitaire : génère un ISO timestamp
@@ -143,6 +144,7 @@ export function useTaskManager() {
     add,
     toggle,
     remove,
+    update,
     refresh
   };
 }
