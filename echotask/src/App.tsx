@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Task } from './types';  
+import { localRewrite, cloudRewrite } from './rewrite';  
 import { ToastHost, toast } from './ui/Toast';
 import { useI18n, LANG_META } from './i18n';
 import LanguageSwitch from './ui/LanguageSwitch';
@@ -9,7 +11,8 @@ import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
 import DraftEditor from './ui/DraftEditor';
 import ThemeToggle from './ui/ThemeToggle';  
-import WelcomeModal from './ui/WelcomeModal';  
+import WelcomeModal from './ui/WelcomeModal';
+import EditTaskModal from './ui/EditTaskModal';
 import EmptyState from './ui/EmptyState';      
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
@@ -35,6 +38,8 @@ export default function App() {
     setShowWelcome(false);
     localStorage.setItem('hasVisited', 'true');
   };
+
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
     localStorage.setItem("allowCloud", allowCloud ? "1" : "0");
@@ -109,6 +114,31 @@ export default function App() {
       toast(t("toast.saved"), { type: 'success' });
     } catch {
       toast(t("toast.rewriteError"), { type: 'error' });
+    }
+  }
+
+  function handleEdit(id: string) {
+    const taskToEdit = manager.tasks.find(t => t.id === id);
+    if (taskToEdit) {
+      setEditingTask(taskToEdit);
+    }
+  }
+  async function handleSaveEdit(updatedTask: Task) {
+    await manager.update(updatedTask);
+    setEditingTask(null);
+    toast(t("toast.updated"), { type: 'success' });
+  }
+  async function handleImproveInEdit(): Promise<string> {
+    if (!editingTask) return '';
+    try {
+      if (allowCloud && apiKey) {
+        return await cloudRewrite(editingTask.rawText, apiKey, lang, 'neutral');
+      } else {
+        return localRewrite(editingTask.rawText);
+      }
+    } catch {
+      toast(t("toast.rewriteError"), { type: 'error' });
+      return '';
     }
   }
 
@@ -201,6 +231,7 @@ export default function App() {
         tasks={manager.tasks}
         onToggleDone={handleToggleDone}
         onDelete={handleDelete}
+        onEdit={handleEdit}
         emptyMessage={t("empty")}
         toggleLabel={t("filter.done")}
       />
@@ -226,6 +257,22 @@ export default function App() {
           step3={t("welcome.step3")}
           startButton={t("welcome.start")}
           learnMoreButton={t("welcome.learnMore")}
+        />
+      )}
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onSave={handleSaveEdit}
+          onCancel={() => setEditingTask(null)}
+          onImprove={handleImproveInEdit}
+          title={t("edit.title")}
+          rawLabel={t("raw")}
+          cleanLabel={t("clean")}
+          tagsLabel={t("tags")}
+          tagsPlaceholder={t("edit.tagsPlaceholder")}
+          saveButton={t("btn.save")}
+          cancelButton={t("btn.cancel")}
+          improveButton={t("btn.improve")}
         />
       )}
     </div>

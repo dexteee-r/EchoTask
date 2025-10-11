@@ -1,6 +1,6 @@
 // src/hooks/useTaskManager.ts
 import { useEffect, useState } from 'react';
-import { createTask, listTasks, removeTask, toggleDone, Task, safeId } from '../db';
+import { createTask, listTasks, removeTask, toggleDone, updateTask, Task, safeId } from '../db';
 
 /**
  * Utilitaire : génère un ISO timestamp
@@ -115,6 +115,14 @@ export function useTaskManager() {
    */
   async function remove(id: string) {
     await removeTask(id);
+    await refresh();
+  }
+
+  /**
+  * Met à jour une tâche existante
+  */
+  async function update(task: Task) {
+    await updateTask(task);
     await refresh();
   }
 
