@@ -42,5 +42,21 @@
   "lang.label": "Langue",
   "lang.fr": "Français",
   "lang.en": "English",
-  "lang.ar": "العربية"
+  "lang.ar": "العربية",
+  "task.complete": "Achever",
+  "subtask.toggle": "sous-tâches",
+  "subtask.placeholder": "Ajouter une sous-tâche…",
+  "stats.active": "actives",
+  "stats.done": "faites",
+  "stats.empty": "Aucune tâche",
+  "due.label": "Échéance",
+  "due.placeholder": "Aucune date",
+  "due.today": "Aujourd'hui",
+  "due.tomorrow": "Demain",
+  "due.in2": "Dans 2 jours",
+  "due.in3": "Dans 3 jours",
+  "due.in4": "Dans 4 jours",
+  "due.in5": "Dans 5 jours",
+  "due.days": "jours",
+  "due.overdue": "En retard"
 }

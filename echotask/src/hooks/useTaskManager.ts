@@ -1,7 +1,7 @@
 // src/hooks/useTaskManager.ts
 import { useEffect, useState } from 'react';
 import { createTask, listTasks, removeTask, toggleDone, updateTask, safeId } from '../db';
-import { Task } from '../types';
+import { Task, SubTask } from '../types';
 
 /**
  * Utilitaire : génère un ISO timestamp
@@ -69,7 +69,16 @@ export function useTaskManager() {
       return matchText && matchTags;
     });
 
-    setTasks(filtered);
+    // Tri : tâches avec échéance en premier (date ASC → overdue apparaît en tête),
+    // puis tâches sans échéance triées par date de création DESC
+    const sorted = [...filtered].sort((a, b) => {
+      if (a.due && b.due) return a.due.localeCompare(b.due);
+      if (a.due) return -1;
+      if (b.due) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    setTasks(sorted);
   }
 
   // Rafraîchir automatiquement quand les filtres changent
@@ -79,19 +88,20 @@ export function useTaskManager() {
 
   /**
    * Ajoute une nouvelle tâche
-   * 
+   *
    * @param raw - Texte brut de la tâche
    * @param cleanText - Texte amélioré (optionnel)
    * @param tagsStr - Tags séparés par virgules (optionnel)
+   * @param due - Date d'échéance YYYY-MM-DD (optionnel)
    */
-  async function add(raw: string, cleanText?: string | null, tagsStr?: string) {
+  async function add(raw: string, cleanText?: string | null, tagsStr?: string, due?: string | null) {
     const task: Task = {
       id: safeId(),
       rawText: raw,
       cleanText: cleanText ?? null,
       status: 'active',
       tags: parseTags(tagsStr || ''),
-      due: null,
+      due: due ?? null,
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
@@ -127,6 +137,52 @@ export function useTaskManager() {
     await refresh();
   }
 
+  /**
+   * Ajoute une sous-tâche à une tâche existante
+   */
+  async function addSubtask(taskId: string, text: string) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task || !text.trim()) return;
+    const sub: SubTask = { id: safeId(), text: text.trim(), done: false };
+    await updateTask({
+      ...task,
+      subtasks: [...(task.subtasks || []), sub],
+      updatedAt: nowIso()
+    });
+    await refresh();
+  }
+
+  /**
+   * Toggle le statut fait/non fait d'une sous-tâche
+   */
+  async function toggleSubtask(taskId: string, subtaskId: string) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    await updateTask({
+      ...task,
+      subtasks: (task.subtasks || []).map(s =>
+        s.id === subtaskId ? { ...s, done: !s.done } : s
+      ),
+      updatedAt: nowIso()
+    });
+    await refresh();
+  }
+
+  /**
+   * Achève une tâche : status → done + toutes les sous-tâches → done
+   */
+  async function completeTask(taskId: string) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    await updateTask({
+      ...task,
+      status: 'done',
+      subtasks: (task.subtasks || []).map(s => ({ ...s, done: true })),
+      updatedAt: nowIso()
+    });
+    await refresh();
+  }
+
   // API publique du hook
   return {
     // État
@@ -145,6 +201,9 @@ export function useTaskManager() {
     toggle,
     remove,
     update,
+    addSubtask,
+    toggleSubtask,
+    completeTask,
     refresh
   };
 }

@@ -42,5 +42,21 @@
   "lang.label": "Language",
   "lang.fr": "Français",
   "lang.en": "English",
-  "lang.ar": "العربية"
+  "lang.ar": "العربية",
+  "task.complete": "Complete",
+  "subtask.toggle": "subtasks",
+  "subtask.placeholder": "Add a subtask…",
+  "stats.active": "active",
+  "stats.done": "done",
+  "stats.empty": "No tasks",
+  "due.label": "Due date",
+  "due.placeholder": "No date",
+  "due.today": "Today",
+  "due.tomorrow": "Tomorrow",
+  "due.in2": "In 2 days",
+  "due.in3": "In 3 days",
+  "due.in4": "In 4 days",
+  "due.in5": "In 5 days",
+  "due.days": "days",
+  "due.overdue": "Overdue"
 }

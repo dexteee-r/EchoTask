@@ -42,5 +42,21 @@
   "lang.label": "اللغة",
   "lang.fr": "Français",
   "lang.en": "English",
-  "lang.ar": "العربية"
+  "lang.ar": "العربية",
+  "task.complete": "أنهِ",
+  "subtask.toggle": "مهام فرعية",
+  "subtask.placeholder": "أضف مهمة فرعية…",
+  "stats.active": "نشطة",
+  "stats.done": "منجزة",
+  "stats.empty": "لا توجد مهام",
+  "due.label": "الموعد النهائي",
+  "due.placeholder": "بلا تاريخ",
+  "due.today": "اليوم",
+  "due.tomorrow": "غداً",
+  "due.in2": "بعد يومين",
+  "due.in3": "بعد 3 أيام",
+  "due.in4": "بعد 4 أيام",
+  "due.in5": "بعد 5 أيام",
+  "due.days": "أيام",
+  "due.overdue": "متأخرة"
 }
