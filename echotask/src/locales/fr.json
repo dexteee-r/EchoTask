@@ -60,5 +60,13 @@
   "due.in4": "Dans 4 jours",
   "due.in5": "Dans 5 jours",
   "due.days": "jours",
-  "due.overdue": "En retard"
+  "due.overdue": "En retard",
+  "toast.updated": "Tâche mise à jour ✅",
+  "edit.title": "Modifier la tâche",
+  "tags": "Tags",
+  "edit.tagsPlaceholder": "Tags (séparés par virgules)",
+  "filter.label": "Filtre statut",
+  "task.markDone": "Marquer comme fait",
+  "task.markActive": "Rouvrir la tâche",
+  "task.delete": "Supprimer la tâche"
 }

@@ -44,6 +44,7 @@ export default function AddTaskForm({
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder={placeholderText}
+          aria-label={placeholderText}
           style={{ flex: 1 }}
         />
         <button type="submit" className="btn btn-primary">
@@ -58,6 +59,7 @@ export default function AddTaskForm({
           value={inputTags}
           onChange={e => setInputTags(e.target.value)}
           placeholder={placeholderTags}
+          aria-label={placeholderTags}
           style={{ flex: 1 }}
         />
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
@@ -79,6 +81,7 @@ export default function AddTaskForm({
             className="input"
             value={inputDue}
             onChange={e => setInputDue(e.target.value)}
+            aria-label={dueLabel}
             style={{
               width: '150px',
               cursor: 'pointer',

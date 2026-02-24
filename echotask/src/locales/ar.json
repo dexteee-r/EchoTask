@@ -60,5 +60,13 @@
   "due.in4": "بعد 4 أيام",
   "due.in5": "بعد 5 أيام",
   "due.days": "أيام",
-  "due.overdue": "متأخرة"
+  "due.overdue": "متأخرة",
+  "toast.updated": "تم تحديث المهمة ✅",
+  "edit.title": "تعديل المهمة",
+  "tags": "الوسوم",
+  "edit.tagsPlaceholder": "الوسوم (مفصولة بفواصل)",
+  "filter.label": "تصفية الحالة",
+  "task.markDone": "وضع علامة منجزة",
+  "task.markActive": "إعادة فتح المهمة",
+  "task.delete": "حذف المهمة"
 }

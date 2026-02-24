@@ -114,6 +114,7 @@ export default function EditTaskModal({
             </h2>
             <button
               onClick={onCancel}
+              aria-label={cancelButton}
               style={{
                 background: 'none',
                 border: 'none',

@@ -102,8 +102,8 @@ export default function TaskItem({
         <button
           type="button"
           onClick={() => onToggleDone(task.id)}
-          aria-label="toggle"
-          title={toggleLabel}
+          aria-label={task.status === 'done' ? t('task.markActive') : t('task.markDone')}
+          aria-pressed={task.status === 'done'}
           style={{
             cursor: 'pointer',
             background: 'none',
@@ -241,7 +241,7 @@ export default function TaskItem({
         <button
           type="button"
           onClick={() => onEdit(task.id)}
-          aria-label="edit"
+          aria-label={t('edit.title')}
           style={{
             cursor: 'pointer',
             background: 'none',
@@ -273,7 +273,7 @@ export default function TaskItem({
         <button
           type="button"
           onClick={handleDelete}
-          aria-label="delete"
+          aria-label={t('task.delete')}
           disabled={isRemoving}
           style={{
             cursor: isRemoving ? 'default' : 'pointer',
@@ -313,6 +313,8 @@ export default function TaskItem({
         <button
           type="button"
           onClick={() => setIsExpanded(v => !v)}
+          aria-expanded={isExpanded}
+          aria-label={subtaskToggleLabel}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -458,6 +460,7 @@ export default function TaskItem({
                   onChange={e => setNewSub(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleAddSub(); }}
                   placeholder={subtaskPlaceholder}
+                  aria-label={subtaskPlaceholder}
                   style={{
                     flex: 1,
                     background: 'transparent',

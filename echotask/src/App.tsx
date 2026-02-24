@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Task } from './types';  
-import { localRewrite, cloudRewrite } from './rewrite';  
+import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { Task } from './types';
+import { localRewrite, cloudRewrite } from './rewrite';
 import { ToastHost, toast } from './ui/Toast';
 import { useI18n, LANG_META } from './i18n';
 import LanguageSwitch from './ui/LanguageSwitch';
@@ -9,12 +9,14 @@ import TaskList from './ui/TaskList';
 import FilterBar from './ui/FilterBar';
 import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
-import DraftEditor from './ui/DraftEditor';
-import ThemeToggle from './ui/ThemeToggle';  
-import WelcomeModal from './ui/WelcomeModal';
-import EditTaskModal from './ui/EditTaskModal';
+import ThemeToggle from './ui/ThemeToggle';
 import EmptyState from './ui/EmptyState';
 import TaskStats from './ui/TaskStats';
+
+// Chargement différé — code splitting pour les composants conditionnels
+const DraftEditor   = lazy(() => import('./ui/DraftEditor'));
+const WelcomeModal  = lazy(() => import('./ui/WelcomeModal'));
+const EditTaskModal = lazy(() => import('./ui/EditTaskModal'));
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
 import { useDraft } from './hooks/useDraft';
@@ -181,7 +183,9 @@ export default function App() {
       <ToastHost />
 
       {/* Header */}
-      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}
+        role="banner"
+      >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <h1 style={{ margin: 0 }}>{t("app.title")}</h1>
           <span style={{
@@ -197,7 +201,7 @@ export default function App() {
         </div>
 
         <div className="input-row" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge">
+          <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge" aria-label={t("filter.label")}>
             <option value="all">{t("filter.all")}</option>
             <option value="active">{t("filter.active")}</option>
             <option value="done">{t("filter.done")}</option>
@@ -217,6 +221,9 @@ export default function App() {
           <LanguageSwitch />
         </div>
       </header>
+
+      {/* Contenu principal */}
+      <main>
 
       {/* Filtres */}
       <FilterBar
@@ -261,6 +268,7 @@ export default function App() {
 
       {/* Brouillon */}
       {draft.draft && (
+        <Suspense fallback={null}>
         <DraftEditor
           draft={draft.draft}
           clean={draft.clean}
@@ -279,6 +287,7 @@ export default function App() {
           saveLabel={t("btn.save")}
           cancelLabel={t("btn.cancel")}
         />
+        </Suspense>
       )}
 
       {/* === Liste des tâches === */}
@@ -311,6 +320,7 @@ export default function App() {
 
       {/* 🆕 Welcome Modal (première visite) */}
       {showWelcome && (
+        <Suspense fallback={null}>
         <WelcomeModal
           onClose={handleCloseWelcome}
           title={t("welcome.title")}
@@ -321,8 +331,10 @@ export default function App() {
           startButton={t("welcome.start")}
           learnMoreButton={t("welcome.learnMore")}
         />
+        </Suspense>
       )}
       {editingTask && (
+        <Suspense fallback={null}>
         <EditTaskModal
           task={editingTask}
           onSave={handleSaveEdit}
@@ -339,7 +351,10 @@ export default function App() {
           cancelButton={t("btn.cancel")}
           improveButton={t("btn.improve")}
         />
+        </Suspense>
       )}
+
+      </main>
     </div>
   );
 }
