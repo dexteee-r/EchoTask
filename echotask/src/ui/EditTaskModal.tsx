@@ -12,6 +12,10 @@ interface EditTaskModalProps {
   cleanLabel: string;
   tagsLabel: string;
   tagsPlaceholder: string;
+  dueLabel: string;
+  duePlaceholder: string;
+  filePathLabel: string;
+  filePathPlaceholder: string;
   saveButton: string;
   cancelButton: string;
   improveButton: string;
@@ -37,16 +41,22 @@ export default function EditTaskModal({
   cleanLabel,
   tagsLabel,
   tagsPlaceholder,
+  dueLabel,
+  duePlaceholder,
+  filePathLabel,
+  filePathPlaceholder,
   saveButton,
   cancelButton,
   improveButton,
   onImprove
 }: EditTaskModalProps) {
-  
+
   // État local pour l'édition
   const [rawText, setRawText] = useState(task.rawText);
   const [cleanText, setCleanText] = useState(task.cleanText || '');
   const [tags, setTags] = useState((task.tags || []).join(', '));
+  const [due, setDue] = useState(task.due || '');
+  const [filePath, setFilePath] = useState(task.filePath || '');
   const [isImproving, setIsImproving] = useState(false);
 
   /**
@@ -58,6 +68,8 @@ export default function EditTaskModal({
       rawText: rawText.trim(),
       cleanText: cleanText.trim() || null,
       tags: tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean),
+      due: due || null,
+      filePath: filePath.trim() || null,
       updatedAt: new Date().toISOString()
     };
     onSave(updatedTask);
@@ -108,6 +120,7 @@ export default function EditTaskModal({
             </h2>
             <button
               onClick={onCancel}
+              aria-label={cancelButton}
               style={{
                 background: 'none',
                 border: 'none',
@@ -212,12 +225,68 @@ export default function EditTaskModal({
               value={tags}
               onChange={e => setTags(e.target.value)}
               placeholder={tagsPlaceholder}
-              style={{ width: '100%' }}
+              style={{ width: '100%', marginBottom: 'var(--space-3)' }}
+            />
+
+            {/* Date d'échéance */}
+            <label style={{
+              display: 'block',
+              fontWeight: 'var(--font-medium)',
+              marginBottom: 'var(--space-1)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-secondary)'
+            }}>
+              {dueLabel}
+            </label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              {!due && (
+                <span style={{
+                  position: 'absolute',
+                  left: 'var(--space-3)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--color-text-tertiary)',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {duePlaceholder}
+                </span>
+              )}
+              <input
+                type="date"
+                className="input"
+                value={due}
+                onChange={e => setDue(e.target.value)}
+                style={{
+                  width: '100%',
+                  cursor: 'pointer',
+                  color: due ? 'var(--color-text)' : 'transparent',
+                }}
+              />
+            </div>
+
+            {/* Chemin fichier / dossier */}
+            <label style={{
+              display: 'block',
+              fontWeight: 'var(--font-medium)',
+              marginBottom: 'var(--space-1)',
+              marginTop: 'var(--space-3)',
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-secondary)'
+            }}>
+              📄 {filePathLabel}
+            </label>
+            <input
+              className="input"
+              value={filePath}
+              onChange={e => setFilePath(e.target.value)}
+              placeholder={filePathPlaceholder}
+              aria-label={filePathLabel}
+              style={{ width: '100%', fontFamily: 'monospace', fontSize: 'var(--text-sm)' }}
             />
           </div>
 
           {/* Actions */}
-          <div style={{ 
+          <div style={{
             display: 'flex',
             gap: 'var(--space-2)'
           }}>

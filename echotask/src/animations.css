@@ -245,7 +245,72 @@
   animation: fadeInScale 0.3s var(--transition-base) forwards;
 }
 
-/* === STAGGERED ANIMATIONS === */
+/* === TASK ANIMATIONS === */
+
+/* Entrée d'une tâche : slide-up + fade, easing ease-out */
+@keyframes taskEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sortie d'une tâche : slide-left + fade, easing ease-in */
+@keyframes taskExit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+}
+
+/* Classe appliquée à l'entrée — stagger via --task-index */
+.task-enter {
+  animation: taskEnter 280ms cubic-bezier(0, 0, 0.58, 1) both;
+  animation-delay: calc(var(--task-index, 0) * 40ms);
+}
+
+/* Classe appliquée au moment de la suppression */
+.task-exit {
+  animation: taskExit 220ms cubic-bezier(0.42, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+/* Accessibilité — désactiver toutes les animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+  .task-enter,
+  .task-exit {
+    animation: none;
+  }
+}
+
+/* === SUBTASK ACCORDION === */
+
+/* Trick CSS grid : anime vers height:auto sans JS */
+.subtasks-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms cubic-bezier(0, 0, 0.58, 1);
+}
+.subtasks-wrap.open {
+  grid-template-rows: 1fr;
+}
+.subtasks-wrap > div {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subtasks-wrap { transition: none; }
+}
+
+/* === STAGGERED ANIMATIONS (legacy) === */
 
 .stagger-item {
   opacity: 0;

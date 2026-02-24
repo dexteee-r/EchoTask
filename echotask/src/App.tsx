@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Task } from './types';  
-import { localRewrite, cloudRewrite } from './rewrite';  
+import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { Task } from './types';
+import { localRewrite, cloudRewrite } from './rewrite';
 import { ToastHost, toast } from './ui/Toast';
 import { useI18n, LANG_META } from './i18n';
 import LanguageSwitch from './ui/LanguageSwitch';
@@ -9,11 +9,14 @@ import TaskList from './ui/TaskList';
 import FilterBar from './ui/FilterBar';
 import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
-import DraftEditor from './ui/DraftEditor';
-import ThemeToggle from './ui/ThemeToggle';  
-import WelcomeModal from './ui/WelcomeModal';
-import EditTaskModal from './ui/EditTaskModal';
-import EmptyState from './ui/EmptyState';      
+import ThemeToggle from './ui/ThemeToggle';
+import EmptyState from './ui/EmptyState';
+import TaskStats from './ui/TaskStats';
+
+// Chargement différé — code splitting pour les composants conditionnels
+const DraftEditor   = lazy(() => import('./ui/DraftEditor'));
+const WelcomeModal  = lazy(() => import('./ui/WelcomeModal'));
+const EditTaskModal = lazy(() => import('./ui/EditTaskModal'));
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
 import { useDraft } from './hooks/useDraft';
@@ -50,18 +53,42 @@ export default function App() {
   }, [apiKey]);
 
   // Hooks métier
+
   const manager = useTaskManager();
   const draft = useDraft();
   const stt = useSTT(
     (text) => draft.updateDraft(text, true),
     meta.stt,
     meta.whisper,
-    apiKey
+    apiKey,
+    (code) => {
+      if (code === 'service-not-allowed') {
+        toast(t("toast.sttBlocked"), { type: 'error' });
+      } else if (code === 'not-allowed') {
+        toast(t("toast.micPermission"), { type: 'error' });
+      } else {
+        toast(t("toast.sttUnsupported"), { type: 'info' });
+      }
+    }
   );
 
+  // PWA Badge — met à jour le badge avec le nombre de tâches actives
+  useEffect(() => {
+    const activeCount = manager.tasks.filter(t => t.status !== 'done').length;
+    if ('setAppBadge' in navigator) {
+      if (activeCount > 0) {
+        (navigator as Navigator & { setAppBadge: (n: number) => Promise<void> })
+          .setAppBadge(activeCount).catch(() => {});
+      } else {
+        (navigator as Navigator & { clearAppBadge: () => Promise<void> })
+          .clearAppBadge?.().catch(() => {});
+      }
+    }
+  }, [manager.tasks]);
+
   // Handlers
-  async function handleAddTask(text: string, tags: string) {
-    await manager.add(text, null, tags);
+  async function handleAddTask(text: string, tags: string, due?: string | null) {
+    await manager.add(text, null, tags, due);
     toast(t("toast.added"), { type: 'success' });
   }
 
@@ -117,6 +144,15 @@ export default function App() {
     }
   }
 
+  function handleTagClick(tag: string) {
+    const current = manager.tagFilter.split(',').map(t => t.trim()).filter(Boolean);
+    if (current.includes(tag)) {
+      manager.setTagFilter(current.filter(t => t !== tag).join(', '));
+    } else {
+      manager.setTagFilter(tag);
+    }
+  }
+
   function handleEdit(id: string) {
     const taskToEdit = manager.tasks.find(t => t.id === id);
     if (taskToEdit) {
@@ -147,11 +183,25 @@ export default function App() {
       <ToastHost />
 
       {/* Header */}
-      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-        <h1 style={{ margin:0 }}>{t("app.title")}</h1>
+      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}
+        role="banner"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <h1 style={{ margin: 0 }}>{t("app.title")}</h1>
+          <span style={{
+            fontSize: 'var(--text-sm)',
+            color: 'var(--color-text-secondary)',
+            fontWeight: 'var(--font-medium)',
+            textTransform: 'capitalize',
+          }}>
+            {new Intl.DateTimeFormat(lang === 'ar' ? 'ar' : lang, {
+              weekday: 'long', day: 'numeric', month: 'long'
+            }).format(new Date())}
+          </span>
+        </div>
 
         <div className="input-row" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge">
+          <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge" aria-label={t("filter.label")}>
             <option value="all">{t("filter.all")}</option>
             <option value="active">{t("filter.active")}</option>
             <option value="done">{t("filter.done")}</option>
@@ -172,6 +222,9 @@ export default function App() {
         </div>
       </header>
 
+      {/* Contenu principal */}
+      <main>
+
       {/* Filtres */}
       <FilterBar
         search={manager.search}
@@ -182,11 +235,20 @@ export default function App() {
         tagFilterPlaceholder={t("tags.filter.placeholder")}
       />
 
+      {/* Stats */}
+      <TaskStats
+        active={manager.tasks.filter(t => t.status !== 'done').length}
+        done={manager.tasks.filter(t => t.status === 'done').length}
+        activeLabel={t("stats.active")}
+        doneLabel={t("stats.done")}
+      />
+
       {/* Ajout rapide */}
       <AddTaskForm
         onSubmit={handleAddTask}
         placeholderText={t("input.placeholder")}
         placeholderTags={t("input.tags.placeholder")}
+        dueLabel={t("due.label")}
         buttonLabel={t("btn.add")}
       />
 
@@ -206,6 +268,7 @@ export default function App() {
 
       {/* Brouillon */}
       {draft.draft && (
+        <Suspense fallback={null}>
         <DraftEditor
           draft={draft.draft}
           clean={draft.clean}
@@ -224,6 +287,7 @@ export default function App() {
           saveLabel={t("btn.save")}
           cancelLabel={t("btn.cancel")}
         />
+        </Suspense>
       )}
 
       {/* === Liste des tâches === */}
@@ -232,8 +296,18 @@ export default function App() {
         onToggleDone={handleToggleDone}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onTagClick={handleTagClick}
+        onAddSubtask={(taskId, text) => manager.addSubtask(taskId, text)}
+        onToggleSubtask={(taskId, subId) => manager.toggleSubtask(taskId, subId)}
+        onRemoveSubtask={(taskId, subId) => manager.removeSubtask(taskId, subId)}
+        onCompleteTask={(taskId) => manager.completeTask(taskId)}
+        onReorder={(ids) => manager.reorderTasks(ids)}
         emptyMessage={t("empty")}
         toggleLabel={t("filter.done")}
+        completeLabel={t("task.complete")}
+        subtaskToggleLabel={t("subtask.toggle")}
+        subtaskPlaceholder={t("subtask.placeholder")}
+        dragLabel={t("task.drag")}
       />
 
       {/* 🆕 Empty State (si liste vide) */}
@@ -248,6 +322,7 @@ export default function App() {
 
       {/* 🆕 Welcome Modal (première visite) */}
       {showWelcome && (
+        <Suspense fallback={null}>
         <WelcomeModal
           onClose={handleCloseWelcome}
           title={t("welcome.title")}
@@ -258,8 +333,10 @@ export default function App() {
           startButton={t("welcome.start")}
           learnMoreButton={t("welcome.learnMore")}
         />
+        </Suspense>
       )}
       {editingTask && (
+        <Suspense fallback={null}>
         <EditTaskModal
           task={editingTask}
           onSave={handleSaveEdit}
@@ -270,11 +347,18 @@ export default function App() {
           cleanLabel={t("clean")}
           tagsLabel={t("tags")}
           tagsPlaceholder={t("edit.tagsPlaceholder")}
+          dueLabel={t("due.label")}
+          duePlaceholder={t("due.placeholder")}
+          filePathLabel={t("task.filepath")}
+          filePathPlaceholder={t("task.filepath.placeholder")}
           saveButton={t("btn.save")}
           cancelButton={t("btn.cancel")}
           improveButton={t("btn.improve")}
         />
+        </Suspense>
       )}
+
+      </main>
     </div>
   );
 }

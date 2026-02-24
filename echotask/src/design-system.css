@@ -42,7 +42,7 @@
   --color-border-light: #f3f4f6;
   --color-text: #111827;
   --color-text-secondary: #6b7280;
-  --color-text-tertiary: #9ca3af;
+  --color-text-tertiary: #737882; /* ratio ~4.5:1 sur blanc — WCAG AA ✓ */
   
   /* Shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -143,6 +143,27 @@
   margin: 0;
   padding: 0;
 }
+
+/* === FOCUS VISIBLE (WCAG 2.1 AA) === */
+/* Masque l'outline par défaut (navigation souris) */
+:focus {
+  outline: none;
+}
+
+/* Anneau de focus visible pour la navigation clavier */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Les inputs gardent leur ring inset (override l'outline global) */
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
 
 html {
   font-size: 16px;

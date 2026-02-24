@@ -1,6 +1,15 @@
 // src/types.ts
 
 /**
+ * Sous-tâche associée à une tâche principale
+ */
+export interface SubTask {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+/**
  * Type principal : Tâche
  */
 export type Task = {
@@ -21,7 +30,13 @@ export type Task = {
   
   /** Date d'échéance ISO (optionnel, futur) */
   due?: string | null;
-  
+
+  /** Sous-tâches de cette tâche */
+  subtasks?: SubTask[];
+
+  /** Chemin vers un fichier ou dossier local (optionnel) */
+  filePath?: string | null;
+
   /** Date de création ISO */
   createdAt: string;
   
@@ -147,9 +162,15 @@ export type UseTaskManagerReturn = {
   setFilter: (filter: TaskFilter) => void;
   setSearch: (search: string) => void;
   setTagFilter: (tags: string) => void;
-  add: (raw: string, cleanText?: string | null, tagsStr?: string) => Promise<void>;
+  add: (raw: string, cleanText?: string | null, tagsStr?: string, due?: string | null) => Promise<void>;
   toggle: (id: string) => Promise<void>;
   remove: (id: string) => Promise<void>;
+  update: (task: Task) => Promise<void>;
+  addSubtask: (taskId: string, text: string) => Promise<void>;
+  toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
+  removeSubtask: (taskId: string, subtaskId: string) => Promise<void>;
+  completeTask: (taskId: string) => Promise<void>;
+  reorderTasks: (orderedIds: string[]) => void;
   refresh: () => Promise<void>;
 };
 
