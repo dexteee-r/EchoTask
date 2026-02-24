@@ -404,14 +404,94 @@ body {
   border-radius: var(--radius-md);
 }
 
-/* Responsive */
+/* === TASK ITEM LAYOUT === */
+
+/* Rangée principale de chaque tâche */
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Zone de contenu texte */
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Groupe boutons d'action (Achever / Edit / Delete) */
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* === APP HEADER LAYOUT === */
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.app-header-end {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* === RESPONSIVE GLOBAL (≤ 768px) === */
 @media (max-width: 768px) {
   .container {
     padding: var(--space-3);
   }
-  
+
   .btn {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-sm);
+  }
+}
+
+/* === RESPONSIVE MOBILE (≤ 540px) === */
+@media (max-width: 540px) {
+  /* Task: wrap la rangée pour que les actions passent en 2ème ligne */
+  .task-row {
+    flex-wrap: wrap;
+  }
+
+  /* Actions : pleine largeur, alignées à droite */
+  .task-actions {
+    flex: 0 0 100%;
+    justify-content: flex-end;
+    margin-top: var(--space-1);
+    gap: var(--space-2);
+  }
+
+  /* Cacher le label texte du bouton "Achever" — garder l'icône ✓ */
+  .complete-btn-label {
+    display: none;
+  }
+
+  /* Header : les actions descendent à la ligne */
+  .app-header-end {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* AddTaskForm : la ligne tags+date wrape sur mobile */
+  .add-form-row {
+    flex-wrap: wrap;
+  }
+
+  .add-form-date {
+    flex: 1 1 auto;
+  }
+
+  .add-form-date input[type="date"] {
+    width: 100% !important;
   }
 }

@@ -245,6 +245,27 @@
   animation: fadeInScale 0.3s var(--transition-base) forwards;
 }
 
+/* Modal bottom sheet sur mobile */
+@media (max-width: 540px) {
+  .modal {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    overflow-y: auto;
+  }
+
+  .modal-content {
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 16px));
+  }
+}
+
 /* === TASK ANIMATIONS === */
 
 /* Entrée d'une tâche : slide-up + fade, easing ease-out */

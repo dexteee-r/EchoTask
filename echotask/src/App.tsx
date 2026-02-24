@@ -183,9 +183,7 @@ export default function App() {
       <ToastHost />
 
       {/* Header */}
-      <header style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}
-        role="banner"
-      >
+      <header className="app-header" role="banner">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <h1 style={{ margin: 0 }}>{t("app.title")}</h1>
           <span style={{
@@ -200,7 +198,7 @@ export default function App() {
           </span>
         </div>
 
-        <div className="input-row" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="app-header-end">
           <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge" aria-label={t("filter.label")}>
             <option value="all">{t("filter.all")}</option>
             <option value="active">{t("filter.active")}</option>
