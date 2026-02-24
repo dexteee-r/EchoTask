@@ -5,27 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>EchoTask</title>
 
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="/icons/icon-152.png" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-    <meta name="theme-color" content="#1f3afe" />
-
-    <!-- Preconnect pour les ressources cloud -->
-    <link rel="preconnect" href="https://api.openai.com" crossorigin>
-
+    <!-- Icônes -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="/favicon.ico" sizes="any">
 
-    <!-- PWA manifest + couleurs -->
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#1f3afe">
-
-    <!-- iOS full-screen -->
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+    <meta name="theme-color" content="#6366f1" />
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="EchoTask" />
-    
+
+    <!-- Preconnect (cloud STT / rewrite) -->
+    <link rel="preconnect" href="https://api.openai.com" crossorigin>
+
+    <!-- SEO -->
+    <meta name="description" content="EchoTask — Capture tes tâches par voix ou clavier, améliore-les avec l'IA." />
   </head>
   <body>
     <div id="root"></div>

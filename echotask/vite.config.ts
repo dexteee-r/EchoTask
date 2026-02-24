@@ -11,8 +11,16 @@ export default defineConfig({
       overlay: true
     }
   },
-  // Désactive le cache en dev
   build: {
-    manifest: true
+    manifest: true,
+    // Sépare les gros modules stables en chunks vendor — meilleur cache navigateur
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'dexie':        ['dexie'],
+        }
+      }
+    }
   }
 });
