@@ -167,6 +167,7 @@ export type UseTaskManagerReturn = {
   toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   removeSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   completeTask: (taskId: string) => Promise<void>;
+  reorderTasks: (orderedIds: string[]) => void;
   refresh: () => Promise<void>;
 };
 

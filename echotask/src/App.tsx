@@ -301,11 +301,13 @@ export default function App() {
         onToggleSubtask={(taskId, subId) => manager.toggleSubtask(taskId, subId)}
         onRemoveSubtask={(taskId, subId) => manager.removeSubtask(taskId, subId)}
         onCompleteTask={(taskId) => manager.completeTask(taskId)}
+        onReorder={(ids) => manager.reorderTasks(ids)}
         emptyMessage={t("empty")}
         toggleLabel={t("filter.done")}
         completeLabel={t("task.complete")}
         subtaskToggleLabel={t("subtask.toggle")}
         subtaskPlaceholder={t("subtask.placeholder")}
+        dragLabel={t("task.drag")}
       />
 
       {/* 🆕 Empty State (si liste vide) */}

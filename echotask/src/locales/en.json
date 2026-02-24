@@ -68,5 +68,6 @@
   "filter.label": "Filter tasks",
   "task.markDone": "Mark as done",
   "task.markActive": "Reopen task",
-  "task.delete": "Delete task"
+  "task.delete": "Delete task",
+  "task.drag": "Drag to reorder"
 }

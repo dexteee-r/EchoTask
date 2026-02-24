@@ -68,5 +68,6 @@
   "filter.label": "تصفية الحالة",
   "task.markDone": "وضع علامة منجزة",
   "task.markActive": "إعادة فتح المهمة",
-  "task.delete": "حذف المهمة"
+  "task.delete": "حذف المهمة",
+  "task.drag": "اسحب لإعادة الترتيب"
 }

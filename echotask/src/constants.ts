@@ -6,15 +6,18 @@
 export const STORAGE_KEYS = {
   /** Clé pour les tâches (fallback si IndexedDB indisponible) */
   TASKS: 'echotask_tasks',
-  
+
   /** Clé pour la langue sélectionnée */
   LANG: 'lang',
-  
+
   /** Clé pour l'activation du cloud */
   ALLOW_CLOUD: 'allowCloud',
-  
+
   /** Clé pour l'API key OpenAI */
   API_KEY: 'apiKey',
+
+  /** Ordre manuel des tâches (drag & drop) */
+  TASK_ORDER: 'echotask_order',
 } as const;
 
 /**

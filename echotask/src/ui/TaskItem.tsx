@@ -2,6 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { Task } from '../types';
 import { useI18n } from '../i18n';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface TaskItemProps {
   task: Task;
@@ -20,6 +22,7 @@ interface TaskItemProps {
   completeLabel?: string;
   subtaskToggleLabel?: string;
   subtaskPlaceholder?: string;
+  dragLabel?: string;
 }
 
 export default function TaskItem({
@@ -39,8 +42,20 @@ export default function TaskItem({
   completeLabel = "Achever",
   subtaskToggleLabel = "sous-tâches",
   subtaskPlaceholder = "Ajouter…",
+  dragLabel = "Déplacer",
 }: TaskItemProps) {
   const { t } = useI18n();
+
+  // Drag & drop
+  const {
+    setNodeRef,
+    transform,
+    transition,
+    attributes,
+    listeners,
+    isDragging,
+  } = useSortable({ id: task.id });
+
   const [isRemoving, setIsRemoving] = useState(false);
   const isRemovingRef = useRef(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -85,18 +100,48 @@ export default function TaskItem({
 
   return (
     <li
+      ref={setNodeRef}
       className={`card ${isRemoving ? 'task-exit' : 'task-enter'}`}
       style={{
         '--task-index': Math.min(index, 7),
         marginBottom: 'var(--space-3)',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'box-shadow var(--transition-base)',
+        transition: transition || 'box-shadow var(--transition-base)',
+        transform: CSS.Transform.toString(transform),
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : undefined,
       } as React.CSSProperties}
       onAnimationEnd={handleAnimationEnd}
     >
       {/* === Rangée principale === */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+
+        {/* Poignée drag & drop */}
+        <button
+          type="button"
+          {...listeners}
+          {...attributes}
+          aria-label={dragLabel}
+          style={{
+            cursor: isDragging ? 'grabbing' : 'grab',
+            background: 'none',
+            border: 'none',
+            padding: 'var(--space-2)',
+            color: 'var(--color-text-tertiary)',
+            fontSize: '1rem',
+            flexShrink: 0,
+            lineHeight: 1,
+            touchAction: 'none',
+            borderRadius: 'var(--radius-md)',
+            opacity: 0.35,
+            transition: 'opacity 150ms ease, color 150ms ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = 'var(--color-text-secondary)'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '0.35'; e.currentTarget.style.color = 'var(--color-text-tertiary)'; }}
+        >
+          ⠿
+        </button>
 
         {/* Bouton toggle done */}
         <button

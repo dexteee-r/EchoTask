@@ -68,5 +68,6 @@
   "filter.label": "Filtre statut",
   "task.markDone": "Marquer comme fait",
   "task.markActive": "Rouvrir la tâche",
-  "task.delete": "Supprimer la tâche"
+  "task.delete": "Supprimer la tâche",
+  "task.drag": "Déplacer la tâche"
 }
