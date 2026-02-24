@@ -169,6 +169,20 @@ export function useTaskManager() {
   }
 
   /**
+   * Supprime une sous-tâche d'une tâche existante
+   */
+  async function removeSubtask(taskId: string, subtaskId: string) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    await updateTask({
+      ...task,
+      subtasks: (task.subtasks || []).filter(s => s.id !== subtaskId),
+      updatedAt: nowIso()
+    });
+    await refresh();
+  }
+
+  /**
    * Achève une tâche : status → done + toutes les sous-tâches → done
    */
   async function completeTask(taskId: string) {
@@ -203,6 +217,7 @@ export function useTaskManager() {
     update,
     addSubtask,
     toggleSubtask,
+    removeSubtask,
     completeTask,
     refresh
   };

@@ -18,7 +18,8 @@ export function sttSupported(): boolean {
 export function startLocalSTT(
   onResult: (text: string) => void,
   onEnd?: () => void,
-  lang = 'fr-FR'
+  lang = 'fr-FR',
+  onError?: (code: string) => void
 ) {
   if (!SpeechRec) throw new Error('STT non supporté');
   const rec = new SpeechRec();
@@ -41,7 +42,11 @@ export function startLocalSTT(
   };
 
   rec.onend = () => onEnd && onEnd();
-  rec.onerror = () => onEnd && onEnd();
+  rec.onerror = (e: any) => {
+    const code: string = e?.error || 'unknown';
+    onEnd && onEnd();
+    onError && onError(code);
+  };
 
   rec.start();
   return () => rec.stop();

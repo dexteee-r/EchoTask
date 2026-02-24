@@ -25,6 +25,8 @@
   "toast.deleted": "Task deleted",
   "toast.nothingToSave": "Nothing to save",
   "toast.sttUnsupported": "Local STT not supported here. Use Chrome/Edge or Cloud.",
+  "toast.sttBlocked": "Dictation blocked by this browser (Brave?). Try Chrome/Edge or Cloud.",
+  "toast.micPermission": "Microphone access denied. Allow it in your browser settings.",
   "toast.recStartError": "Cannot start recording (HTTPS/permissions?)",
   "toast.rewriteError": "Rewrite unavailable",
   "empty": "No tasks yet",

@@ -25,6 +25,8 @@
   "toast.deleted": "تم حذف المهمة",
   "toast.nothingToSave": "لا شيء للحفظ",
   "toast.sttUnsupported": "التعرّف المحلي غير مدعوم. استخدم Chrome/Edge أو السحابة.",
+  "toast.sttBlocked": "الإملاء محظور في هذا المتصفح (Brave؟). جرّب Chrome/Edge أو السحابة.",
+  "toast.micPermission": "تم رفض الوصول إلى الميكروفون. اسمح بذلك في إعدادات المتصفح.",
   "toast.recStartError": "تعذر بدء التسجيل (HTTPS/الأذونات؟)",
   "toast.rewriteError": "التحسين غير متاح",
   "empty": "لا توجد مهام حتى الآن",

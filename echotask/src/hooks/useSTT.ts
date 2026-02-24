@@ -22,7 +22,8 @@ export function useSTT(
   onTranscript: (text: string) => void,
   sttLang: string = 'fr-FR',
   whisperLang: string = 'fr',
-  apiKey?: string
+  apiKey?: string,
+  onSttError?: (code: string) => void
 ) {
   // États d'écoute
   const [listeningLocal, setListeningLocal] = useState(false);
@@ -51,7 +52,11 @@ export function useSTT(
     stopLocalRef.current = startLocalSTT(
       (text) => onTranscript(text),
       () => setListeningLocal(false),
-      sttLang
+      sttLang,
+      (code) => {
+        setListeningLocal(false);
+        onSttError?.(code);
+      }
     );
   }
 

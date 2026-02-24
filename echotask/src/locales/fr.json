@@ -25,6 +25,8 @@
   "toast.deleted": "Tâche supprimée",
   "toast.nothingToSave": "Rien à sauvegarder",
   "toast.sttUnsupported": "STT local non supporté ici. Utilise Chrome/Edge ou le Cloud.",
+  "toast.sttBlocked": "Dictée bloquée par ce navigateur (Brave ?). Essaie Chrome/Edge ou le Cloud.",
+  "toast.micPermission": "Accès micro refusé. Autorise-le dans les paramètres du navigateur.",
   "toast.recStartError": "Impossible de démarrer l’enregistrement (HTTPS/permissions ?)",
   "toast.rewriteError": "Réécriture indisponible",
   "empty": "Aucune tâche pour le moment",

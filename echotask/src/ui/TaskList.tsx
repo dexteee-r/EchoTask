@@ -11,6 +11,7 @@ interface TaskListProps {
   onTagClick?: (tag: string) => void;
   onAddSubtask?: (taskId: string, text: string) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
+  onRemoveSubtask?: (taskId: string, subtaskId: string) => void;
   onCompleteTask?: (taskId: string) => void;
   emptyMessage: string;
   toggleLabel: string;
@@ -27,6 +28,7 @@ export default function TaskList({
   onTagClick,
   onAddSubtask,
   onToggleSubtask,
+  onRemoveSubtask,
   onCompleteTask,
   emptyMessage,
   toggleLabel,
@@ -57,6 +59,7 @@ export default function TaskList({
             onTagClick={onTagClick}
             onAddSubtask={onAddSubtask}
             onToggleSubtask={onToggleSubtask}
+            onRemoveSubtask={onRemoveSubtask}
             onCompleteTask={onCompleteTask}
             toggleLabel={toggleLabel}
             completeLabel={completeLabel}

@@ -51,14 +51,38 @@ export default function App() {
   }, [apiKey]);
 
   // Hooks métier
+
   const manager = useTaskManager();
   const draft = useDraft();
   const stt = useSTT(
     (text) => draft.updateDraft(text, true),
     meta.stt,
     meta.whisper,
-    apiKey
+    apiKey,
+    (code) => {
+      if (code === 'service-not-allowed') {
+        toast(t("toast.sttBlocked"), { type: 'error' });
+      } else if (code === 'not-allowed') {
+        toast(t("toast.micPermission"), { type: 'error' });
+      } else {
+        toast(t("toast.sttUnsupported"), { type: 'info' });
+      }
+    }
   );
+
+  // PWA Badge — met à jour le badge avec le nombre de tâches actives
+  useEffect(() => {
+    const activeCount = manager.tasks.filter(t => t.status !== 'done').length;
+    if ('setAppBadge' in navigator) {
+      if (activeCount > 0) {
+        (navigator as Navigator & { setAppBadge: (n: number) => Promise<void> })
+          .setAppBadge(activeCount).catch(() => {});
+      } else {
+        (navigator as Navigator & { clearAppBadge: () => Promise<void> })
+          .clearAppBadge?.().catch(() => {});
+      }
+    }
+  }, [manager.tasks]);
 
   // Handlers
   async function handleAddTask(text: string, tags: string, due?: string | null) {
@@ -266,6 +290,7 @@ export default function App() {
         onTagClick={handleTagClick}
         onAddSubtask={(taskId, text) => manager.addSubtask(taskId, text)}
         onToggleSubtask={(taskId, subId) => manager.toggleSubtask(taskId, subId)}
+        onRemoveSubtask={(taskId, subId) => manager.removeSubtask(taskId, subId)}
         onCompleteTask={(taskId) => manager.completeTask(taskId)}
         emptyMessage={t("empty")}
         toggleLabel={t("filter.done")}

@@ -12,6 +12,7 @@ interface TaskItemProps {
   onTagClick?: (tag: string) => void;
   onAddSubtask?: (taskId: string, text: string) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
+  onRemoveSubtask?: (taskId: string, subtaskId: string) => void;
   onCompleteTask?: (taskId: string) => void;
   toggleLabel: string;
   editLabel?: string;
@@ -30,6 +31,7 @@ export default function TaskItem({
   onTagClick,
   onAddSubtask,
   onToggleSubtask,
+  onRemoveSubtask,
   onCompleteTask,
   toggleLabel,
   editLabel = "✏️",
@@ -393,6 +395,7 @@ export default function TaskItem({
 
                   {/* Texte */}
                   <span style={{
+                    flex: 1,
                     fontSize: 'var(--text-sm)',
                     color: sub.done ? 'var(--color-text-tertiary)' : 'var(--color-text-secondary)',
                     textDecoration: sub.done ? 'line-through' : 'none',
@@ -400,6 +403,37 @@ export default function TaskItem({
                   }}>
                     {sub.text}
                   </span>
+
+                  {/* Bouton supprimer sous-tâche */}
+                  {onRemoveSubtask && (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveSubtask(task.id, sub.id)}
+                      aria-label="supprimer sous-tâche"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '2px 4px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-tertiary)',
+                        lineHeight: 1,
+                        flexShrink: 0,
+                        transition: 'color 150ms cubic-bezier(0, 0, 0.58, 1), transform 150ms cubic-bezier(0, 0, 0.58, 1)',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.color = 'var(--color-error)';
+                        e.currentTarget.style.transform = 'scale(1.2)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.color = 'var(--color-text-tertiary)';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               ))}
 

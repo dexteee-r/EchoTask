@@ -144,6 +144,27 @@
   padding: 0;
 }
 
+/* === FOCUS VISIBLE (WCAG 2.1 AA) === */
+/* Masque l'outline par défaut (navigation souris) */
+:focus {
+  outline: none;
+}
+
+/* Anneau de focus visible pour la navigation clavier */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Les inputs gardent leur ring inset (override l'outline global) */
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
