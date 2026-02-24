@@ -404,6 +404,14 @@ body {
   border-radius: var(--radius-md);
 }
 
+/* === APP CONTAINER === */
+.app-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  font-family: var(--font-family);
+}
+
 /* === TASK ITEM LAYOUT === */
 
 /* Rangée principale de chaque tâche */
@@ -458,6 +466,21 @@ body {
 
 /* === RESPONSIVE MOBILE (≤ 540px) === */
 @media (max-width: 540px) {
+  /* Réduire l'échelle globale — tous les rem s'adaptent */
+  html {
+    font-size: 14px;
+  }
+
+  /* Container principal plus serré */
+  .app-container {
+    padding: var(--space-3) !important;
+  }
+
+  /* Cards plus compactes */
+  .card {
+    padding: var(--space-3);
+  }
+
   /* Task: wrap la rangée pour que les actions passent en 2ème ligne */
   .task-row {
     flex-wrap: wrap;

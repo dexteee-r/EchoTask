@@ -179,7 +179,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ maxWidth: 980, margin: '0 auto', padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+    <div className="app-container">
       <ToastHost />
 
       {/* Header */}
