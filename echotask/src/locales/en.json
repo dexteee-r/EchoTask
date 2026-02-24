@@ -69,5 +69,9 @@
   "task.markDone": "Mark as done",
   "task.markActive": "Reopen task",
   "task.delete": "Delete task",
-  "task.drag": "Drag to reorder"
+  "task.drag": "Drag to reorder",
+  "task.filepath": "File / Folder",
+  "task.filepath.placeholder": "Paste a local path (e.g. C:\\projects\\notes.txt)",
+  "task.filepath.copy": "Copy path",
+  "task.filepath.copied": "Copied!"
 }

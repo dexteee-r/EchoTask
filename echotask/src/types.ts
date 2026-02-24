@@ -34,6 +34,9 @@ export type Task = {
   /** Sous-tâches de cette tâche */
   subtasks?: SubTask[];
 
+  /** Chemin vers un fichier ou dossier local (optionnel) */
+  filePath?: string | null;
+
   /** Date de création ISO */
   createdAt: string;
   

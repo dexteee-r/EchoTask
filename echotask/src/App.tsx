@@ -349,6 +349,8 @@ export default function App() {
           tagsPlaceholder={t("edit.tagsPlaceholder")}
           dueLabel={t("due.label")}
           duePlaceholder={t("due.placeholder")}
+          filePathLabel={t("task.filepath")}
+          filePathPlaceholder={t("task.filepath.placeholder")}
           saveButton={t("btn.save")}
           cancelButton={t("btn.cancel")}
           improveButton={t("btn.improve")}

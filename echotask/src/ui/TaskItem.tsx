@@ -46,6 +46,19 @@ export default function TaskItem({
 }: TaskItemProps) {
   const { t } = useI18n();
 
+  // Copier le chemin dans le presse-papier
+  const [pathCopied, setPathCopied] = useState(false);
+  async function handleCopyPath() {
+    if (!task.filePath) return;
+    try {
+      await navigator.clipboard.writeText(task.filePath);
+      setPathCopied(true);
+      setTimeout(() => setPathCopied(false), 1800);
+    } catch {
+      // Fallback si clipboard non disponible
+    }
+  }
+
   // Drag & drop
   const {
     setNodeRef,
@@ -242,6 +255,47 @@ export default function TaskItem({
               }}>
                 {dueInfo.label}
               </span>
+            </div>
+          )}
+
+          {task.filePath && (
+            <div style={{ marginTop: 'var(--space-2)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+              <span style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-tertiary)',
+                fontFamily: 'monospace',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '220px',
+              }}
+                title={task.filePath}
+              >
+                📄 {task.filePath}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyPath}
+                aria-label={pathCopied ? t('task.filepath.copied') : t('task.filepath.copy')}
+                title={pathCopied ? t('task.filepath.copied') : t('task.filepath.copy')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '1px var(--space-1)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: 'var(--text-xs)',
+                  fontWeight: 'var(--font-medium)',
+                  color: pathCopied ? 'var(--color-success)' : 'var(--color-text-tertiary)',
+                  flexShrink: 0,
+                  transition: 'color 150ms ease, transform 150ms ease',
+                  lineHeight: 1,
+                }}
+                onMouseEnter={e => { if (!pathCopied) { e.currentTarget.style.color = 'var(--color-primary)'; e.currentTarget.style.transform = 'scale(1.1)'; } }}
+                onMouseLeave={e => { if (!pathCopied) { e.currentTarget.style.color = 'var(--color-text-tertiary)'; e.currentTarget.style.transform = 'scale(1)'; } }}
+              >
+                {pathCopied ? '✓' : '⎘'}
+              </button>
             </div>
           )}
         </div>
