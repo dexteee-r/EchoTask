@@ -144,8 +144,13 @@ export default function EditTaskModal({
             </button>
           </div>
 
-          {/* Formulaire */}
-          <div style={{ marginBottom: 'var(--space-4)' }}>
+          {/* Formulaire — scrollable si trop haut (zoom, petit écran) */}
+          <div style={{
+            overflowY: 'auto',
+            maxHeight: 'calc(90vh - 180px)',
+            marginBottom: 'var(--space-4)',
+            paddingRight: 'var(--space-1)',
+          }}>
             {/* Texte brut */}
             <label style={{ 
               display: 'block',
