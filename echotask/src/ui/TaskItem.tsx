@@ -15,11 +15,9 @@ interface TaskItemProps {
   onAddSubtask?: (taskId: string, text: string) => void;
   onToggleSubtask?: (taskId: string, subtaskId: string) => void;
   onRemoveSubtask?: (taskId: string, subtaskId: string) => void;
-  onCompleteTask?: (taskId: string) => void;
   toggleLabel: string;
   editLabel?: string;
   deleteLabel?: string;
-  completeLabel?: string;
   subtaskToggleLabel?: string;
   subtaskPlaceholder?: string;
   dragLabel?: string;
@@ -35,11 +33,9 @@ export default function TaskItem({
   onAddSubtask,
   onToggleSubtask,
   onRemoveSubtask,
-  onCompleteTask,
   toggleLabel,
   editLabel = "✏️",
   deleteLabel = "🗑",
-  completeLabel = "Achever",
   subtaskToggleLabel = "sous-tâches",
   subtaskPlaceholder = "Ajouter…",
   dragLabel = "Déplacer",
@@ -306,44 +302,6 @@ export default function TaskItem({
 
         {/* Groupe boutons d'action — 2ème rangée sur mobile */}
         <div className="task-actions">
-
-          {/* Bouton Achever — visible uniquement sur les tâches actives */}
-          {task.status === 'active' && onCompleteTask && (
-            <button
-              type="button"
-              onClick={() => onCompleteTask(task.id)}
-              aria-label={completeLabel}
-              title={completeLabel}
-              style={{
-                cursor: 'pointer',
-                background: 'none',
-                border: 'none',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 'var(--font-semibold)',
-                padding: '3px var(--space-2)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-success)',
-                letterSpacing: '0.02em',
-                transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1)',
-                whiteSpace: 'nowrap',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '3px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--color-success-light, rgba(34,197,94,0.12))';
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'none';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
-              onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-            >
-              ✓ <span className="complete-btn-label">{completeLabel}</span>
-            </button>
-          )}
 
           {/* Bouton éditer */}
           <button
