@@ -53,7 +53,7 @@ export default function AddTaskForm({
       </form>
 
       {/* Ligne secondaire : tags + date côte à côte */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
+      <div className="add-form-row" style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
         <input
           className="input"
           value={inputTags}
@@ -62,7 +62,7 @@ export default function AddTaskForm({
           aria-label={placeholderTags}
           style={{ flex: 1 }}
         />
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <div className="add-form-date" style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {/* Faux placeholder visible quand pas de date sélectionnée */}
           {!inputDue && (
             <span style={{

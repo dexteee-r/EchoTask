@@ -128,7 +128,7 @@ export default function TaskItem({
       onAnimationEnd={handleAnimationEnd}
     >
       {/* === Rangée principale === */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+      <div className="task-row">
 
         {/* Poignée drag & drop */}
         <button
@@ -188,7 +188,7 @@ export default function TaskItem({
         </button>
 
         {/* Contenu de la tâche */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="task-body">
           <div style={{
             fontWeight: 'var(--font-semibold)',
             fontSize: 'var(--text-base)',
@@ -197,6 +197,8 @@ export default function TaskItem({
             opacity: task.status === 'done' ? 0.6 : 1,
             marginBottom: task.cleanText ? 'var(--space-1)' : 0,
             transition: 'opacity var(--transition-base), text-decoration var(--transition-base)',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
           }}>
             {task.rawText}
           </div>
@@ -207,6 +209,8 @@ export default function TaskItem({
               color: 'var(--color-text-secondary)',
               marginTop: 'var(--space-1)',
               lineHeight: 'var(--leading-relaxed)',
+              wordBreak: 'break-word',
+              overflowWrap: 'anywhere',
             }}>
               {task.cleanText}
             </div>
@@ -300,108 +304,113 @@ export default function TaskItem({
           )}
         </div>
 
-        {/* Bouton Achever — visible uniquement sur les tâches actives */}
-        {task.status === 'active' && onCompleteTask && (
+        {/* Groupe boutons d'action — 2ème rangée sur mobile */}
+        <div className="task-actions">
+
+          {/* Bouton Achever — visible uniquement sur les tâches actives */}
+          {task.status === 'active' && onCompleteTask && (
+            <button
+              type="button"
+              onClick={() => onCompleteTask(task.id)}
+              aria-label={completeLabel}
+              title={completeLabel}
+              style={{
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 'var(--font-semibold)',
+                padding: '3px var(--space-2)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-success)',
+                letterSpacing: '0.02em',
+                transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1)',
+                whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-success-light, rgba(34,197,94,0.12))';
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'none';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+            >
+              ✓ <span className="complete-btn-label">{completeLabel}</span>
+            </button>
+          )}
+
+          {/* Bouton éditer */}
           <button
             type="button"
-            onClick={() => onCompleteTask(task.id)}
-            aria-label={completeLabel}
-            title={completeLabel}
+            onClick={() => onEdit(task.id)}
+            aria-label={t('edit.title')}
             style={{
               cursor: 'pointer',
               background: 'none',
               border: 'none',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 'var(--font-semibold)',
-              padding: '3px var(--space-2)',
+              fontSize: '1.25rem',
+              padding: 'var(--space-2)',
               borderRadius: 'var(--radius-md)',
-              flexShrink: 0,
-              color: 'var(--color-success)',
-              letterSpacing: '0.02em',
-              transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1)',
-              whiteSpace: 'nowrap',
+              transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1), color 150ms cubic-bezier(0, 0, 0.58, 1)',
+              color: 'var(--color-text-tertiary)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--color-success-light, rgba(34,197,94,0.12))';
-              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.background = 'var(--color-primary-light)';
+              e.currentTarget.style.color = 'var(--color-primary)';
+              e.currentTarget.style.transform = 'scale(1.1)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'none';
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
               e.currentTarget.style.transform = 'scale(1)';
             }}
             onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
-            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
           >
-            ✓ {completeLabel}
+            {editLabel}
           </button>
-        )}
 
-        {/* Bouton éditer */}
-        <button
-          type="button"
-          onClick={() => onEdit(task.id)}
-          aria-label={t('edit.title')}
-          style={{
-            cursor: 'pointer',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.25rem',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-md)',
-            flexShrink: 0,
-            transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1), color 150ms cubic-bezier(0, 0, 0.58, 1)',
-            color: 'var(--color-text-tertiary)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--color-primary-light)';
-            e.currentTarget.style.color = 'var(--color-primary)';
-            e.currentTarget.style.transform = 'scale(1.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.color = 'var(--color-text-tertiary)';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-          onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)'; }}
-          onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
-        >
-          {editLabel}
-        </button>
+          {/* Bouton supprimer */}
+          <button
+            type="button"
+            onClick={handleDelete}
+            aria-label={t('task.delete')}
+            disabled={isRemoving}
+            style={{
+              cursor: isRemoving ? 'default' : 'pointer',
+              background: 'none',
+              border: 'none',
+              fontSize: '1.25rem',
+              padding: 'var(--space-2)',
+              borderRadius: 'var(--radius-md)',
+              transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1), color 150ms cubic-bezier(0, 0, 0.58, 1)',
+              color: 'var(--color-text-tertiary)',
+            }}
+            onMouseEnter={(e) => {
+              if (!isRemoving) {
+                e.currentTarget.style.background = 'var(--color-error-light)';
+                e.currentTarget.style.color = 'var(--color-error)';
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'none';
+              e.currentTarget.style.color = 'var(--color-text-tertiary)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+            onMouseDown={(e) => { if (!isRemoving) e.currentTarget.style.transform = 'scale(0.95)'; }}
+            onMouseUp={(e) => { if (!isRemoving) e.currentTarget.style.transform = 'scale(1.1)'; }}
+          >
+            {deleteLabel}
+          </button>
 
-        {/* Bouton supprimer */}
-        <button
-          type="button"
-          onClick={handleDelete}
-          aria-label={t('task.delete')}
-          disabled={isRemoving}
-          style={{
-            cursor: isRemoving ? 'default' : 'pointer',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.25rem',
-            padding: 'var(--space-2)',
-            borderRadius: 'var(--radius-md)',
-            flexShrink: 0,
-            transition: 'transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1), color 150ms cubic-bezier(0, 0, 0.58, 1)',
-            color: 'var(--color-text-tertiary)',
-          }}
-          onMouseEnter={(e) => {
-            if (!isRemoving) {
-              e.currentTarget.style.background = 'var(--color-error-light)';
-              e.currentTarget.style.color = 'var(--color-error)';
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'none';
-            e.currentTarget.style.color = 'var(--color-text-tertiary)';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-          onMouseDown={(e) => { if (!isRemoving) e.currentTarget.style.transform = 'scale(0.95)'; }}
-          onMouseUp={(e) => { if (!isRemoving) e.currentTarget.style.transform = 'scale(1.1)'; }}
-        >
-          {deleteLabel}
-        </button>
+        </div>
       </div>
 
       {/* === Section sous-tâches === */}
