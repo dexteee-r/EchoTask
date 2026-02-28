@@ -31,10 +31,10 @@ export function ToastHost() {
               pointerEvents: "auto",
               padding: "10px 12px",
               borderRadius: 10,
-              boxShadow: "0 6px 16px rgba(0,0,0,.15)",
-              background: it.type === "success" ? "#10b981"
-                        : it.type === "error" ? "#ef4444"
-                        : "#111827",
+              boxShadow: "var(--shadow-lg)",
+              background: it.type === "success" ? "var(--color-success)"
+                        : it.type === "error" ? "var(--color-error)"
+                        : "var(--color-bg-tertiary)",
               color: "white",
               fontSize: 14, lineHeight: 1.2
             }}>
