@@ -110,31 +110,48 @@
   --z-tooltip: 1500;
 }
 
-/* === DARK THEME === */
+/* === DARK THEME — Zinc palette + Liquid Glass edges === */
 [data-theme="dark"] {
-  /* Dark Mode Colors */
-  --color-bg: #0f172a;
-  --color-bg-secondary: #1e293b;
-  --color-bg-tertiary: #334155;
-  --color-surface: #1e293b;
-  --color-surface-hover: #334155;
-  --color-border: #334155;
-  --color-border-light: #475569;
-  --color-text: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #94a3b8;
-  
-  /* Adjust primary colors for dark mode */
-  --color-primary: #818cf8;
-  --color-primary-hover: #a5b4fc;
-  --color-primary-light: #312e81;
-  
-  /* Shadows for dark mode */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  /* Neutrals — High-End Zinc Palette */
+  --color-bg: #09090b;            /* zinc-950 */
+  --color-bg-secondary: #121214;
+  --color-bg-tertiary: #18181b;   /* zinc-900 */
+
+  /* Surfaces (Cartes, Modals) */
+  --color-surface: #18181b;       /* zinc-900 */
+  --color-surface-hover: #27272a; /* zinc-800 */
+
+  /* Borders */
+  --color-border: #27272a;        /* zinc-800 */
+  --color-border-light: #3f3f46;  /* zinc-700 */
+
+  /* Typography — contraste WCAG sans éblouir */
+  --color-text: #f4f4f5;          /* zinc-50 */
+  --color-text-secondary: #a1a1aa;/* zinc-400 */
+  --color-text-tertiary: #71717a; /* zinc-500 */
+
+  /* Primary (Indigo) — désaturé pour le confort */
+  --color-primary: #818cf8;       /* indigo-400 */
+  --color-primary-hover: #a5b4fc; /* indigo-300 */
+  --color-primary-light: rgba(99, 102, 241, 0.15);
+  --color-primary-dark: #c7d2fe;  /* indigo-200 — texte sur fond primary-light */
+
+  /* Sémantiques — adoucies (anti-neon) */
+  --color-success: #34d399;       /* emerald-400 */
+  --color-success-light: rgba(52, 211, 153, 0.15);
+  --color-error: #f87171;         /* red-400 */
+  --color-error-light: rgba(248, 113, 113, 0.15);
+  --color-warning: #fbbf24;       /* amber-400 */
+  --color-warning-light: rgba(251, 191, 36, 0.15);
+  --color-info: #60a5fa;          /* blue-400 */
+  --color-info-light: rgba(96, 165, 250, 0.15);
+
+  /* Ombres — plus denses + inner shadow blanche "Glass Edge" */
+  --shadow-xs: 0 1px 2px 0 rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.6), 0 1px 2px -1px rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255,255,255,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.6), 0 2px 4px -2px rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255,255,255,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.6), 0 4px 6px -4px rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255,255,255,0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.6), inset 0 1px 0 0 rgba(255,255,255,0.04);
 }
 
 /* === GLOBAL RESETS === */
