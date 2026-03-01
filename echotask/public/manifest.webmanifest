@@ -15,5 +15,28 @@
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvelle tâche",
+      "short_name": "Ajouter",
+      "description": "Ajouter une tâche rapidement",
+      "url": "/?action=add",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Dicter une tâche",
+      "short_name": "Dicter",
+      "description": "Enregistrer une tâche par la voix",
+      "url": "/?action=voice",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Tâches actives",
+      "short_name": "Actives",
+      "description": "Voir les tâches en cours",
+      "url": "/?filter=active",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    }
   ]
 }
