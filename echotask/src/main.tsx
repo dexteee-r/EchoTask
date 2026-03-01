@@ -28,4 +28,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 );
 
-hideSplash();
+// Laisser le splash visible un court instant après le montage
+setTimeout(hideSplash, 1200);
