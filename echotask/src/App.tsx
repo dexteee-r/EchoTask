@@ -72,6 +72,35 @@ export default function App() {
     }
   );
 
+  // PWA Shortcuts — gérer les query params (?action=add, ?action=voice, ?filter=active)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get('action');
+    const filterParam = params.get('filter');
+
+    if (filterParam === 'active') {
+      manager.setFilter('active');
+    }
+    if (action === 'add') {
+      // Focus sur le champ de saisie
+      setTimeout(() => {
+        const input = document.querySelector<HTMLInputElement>('input[placeholder]');
+        if (input) input.focus();
+      }, 300);
+    }
+    if (action === 'voice') {
+      // Lancer la dictée locale après un court délai
+      setTimeout(() => {
+        try { stt.startLocal(); } catch { /* ignore */ }
+      }, 500);
+    }
+
+    // Nettoyer l'URL sans recharger la page
+    if (action || filterParam) {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // PWA Badge — met à jour le badge avec le nombre de tâches actives
   useEffect(() => {
     const activeCount = manager.tasks.filter(t => t.status !== 'done').length;
