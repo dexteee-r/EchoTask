@@ -16,8 +16,32 @@
     <meta name="theme-color" content="#6366f1" />
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="EchoTask" />
+
+    <!-- iOS Splash Screens (apple-touch-startup-image) -->
+    <!-- iPhone SE, 8, 7, 6s — 750x1334 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/icons/icon-512.png">
+    <!-- iPhone X, XS, 11 Pro, 12 mini, 13 mini — 1125x2436 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPhone XR, 11 — 828x1792 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="/icons/icon-512.png">
+    <!-- iPhone XS Max, 11 Pro Max — 1242x2688 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPhone 12, 13, 14 — 1170x2532 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPhone 12 Pro Max, 13 Pro Max, 14 Plus — 1284x2778 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPhone 14 Pro — 1179x2556 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPhone 14 Pro Max, 15 Plus, 15 Pro Max — 1290x2796 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/icons/icon-512.png">
+    <!-- iPad Mini, Air — 1536x2048 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" href="/icons/icon-512.png">
+    <!-- iPad Pro 11" — 1668x2388 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="/icons/icon-512.png">
+    <!-- iPad Pro 12.9" — 2048x2732 -->
+    <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="/icons/icon-512.png">
 
     <!-- Preconnect (cloud STT / rewrite) -->
     <link rel="preconnect" href="https://api.openai.com" crossorigin>
@@ -26,6 +50,44 @@
     <meta name="description" content="EchoTask — Capture tes tâches par voix ou clavier, améliore-les avec l'IA." />
   </head>
   <body>
+    <!-- Splash screen (visible avant le chargement de React) -->
+    <div id="splash" style="
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #09090b;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    ">
+      <img src="/icons/icon-192.png" alt="" width="80" height="80" style="
+        border-radius: 20px;
+        margin-bottom: 16px;
+        animation: splash-pulse 1.8s ease-in-out infinite;
+      ">
+      <span style="
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: #e4e4e7;
+        letter-spacing: -0.5px;
+      ">EchoTask</span>
+      <span style="
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 13px;
+        color: #71717a;
+        margin-top: 6px;
+      ">Capture. Improve. Manage.</span>
+      <style>
+        @keyframes splash-pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.06); opacity: 0.85; }
+        }
+      </style>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

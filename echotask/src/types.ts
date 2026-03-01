@@ -71,7 +71,7 @@ export type LangMeta = {
 /**
  * Langues supportées par l'application
  */
-export type SupportedLang = 'fr' | 'en' | 'ar';
+export type SupportedLang = 'fr' | 'en' | 'ar' | 'es' | 'zh';
 
 /**
  * Type de toast (notification)

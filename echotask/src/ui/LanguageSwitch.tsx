@@ -24,6 +24,8 @@ export default function LanguageSwitch() {
         <option value="fr">{t("lang.fr")}</option>
         <option value="en">{t("lang.en")}</option>
         <option value="ar">{t("lang.ar")}</option>
+        <option value="es">{t("lang.es")}</option>
+        <option value="zh">{t("lang.zh")}</option>
       </select>
     </label>
   );
