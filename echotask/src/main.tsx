@@ -8,12 +8,24 @@ import './style.css';
 import './animations.css';
 
 
+// Masquer le splash screen une fois React monté
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.style.opacity = '0';
+    splash.style.visibility = 'hidden';
+    setTimeout(() => splash.remove(), 400);
+  }
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider>  {/* 🆕 ENTOURER I18nProvider */}
+    <ThemeProvider>
       <I18nProvider>
         <App />
       </I18nProvider>
-    </ThemeProvider>  {/* 🆕 FERMER */}
+    </ThemeProvider>
   </React.StrictMode>
 );
+
+hideSplash();

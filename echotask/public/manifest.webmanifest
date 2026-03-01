@@ -4,8 +4,8 @@
   "description": "Notes/tâches par la voix, reformulées et claires.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1f3afe",
+  "background_color": "#09090b",
+  "theme_color": "#6366f1",
   "icons": [
     { "src": "/icons/icon-72.png", "sizes": "72x72", "type": "image/png" },
     { "src": "/icons/icon-96.png", "sizes": "96x96", "type": "image/png" },

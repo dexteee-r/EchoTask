@@ -2,11 +2,13 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import fr from "./locales/fr.json";
 import en from "./locales/en.json";
 import ar from "./locales/ar.json";
+import es from "./locales/es.json";
+import zh from "./locales/zh.json";
 
 type Dict = Record<string, string>;
-type Lang = "fr" | "en" | "ar";
+type Lang = "fr" | "en" | "ar" | "es" | "zh";
 
-const dictionaries: Record<Lang, Dict> = { fr, en, ar };
+const dictionaries: Record<Lang, Dict> = { fr, en, ar, es, zh };
 
 function detectLang(): Lang {
   const saved = localStorage.getItem("lang") as Lang | null;
@@ -14,6 +16,8 @@ function detectLang(): Lang {
   const nav = (navigator.language || "en").toLowerCase();
   if (nav.startsWith("fr")) return "fr";
   if (nav.startsWith("ar")) return "ar";
+  if (nav.startsWith("es")) return "es";
+  if (nav.startsWith("zh")) return "zh";
   return "en";
 }
 
@@ -21,7 +25,9 @@ function detectLang(): Lang {
 export const LANG_META: Record<Lang, { stt: string; whisper: string; dir: "ltr"|"rtl" }> = {
   fr: { stt: "fr-FR", whisper: "fr", dir: "ltr" },
   en: { stt: "en-US", whisper: "en", dir: "ltr" },
-  ar: { stt: "ar-SA", whisper: "ar", dir: "rtl" }
+  ar: { stt: "ar-SA", whisper: "ar", dir: "rtl" },
+  es: { stt: "es-ES", whisper: "es", dir: "ltr" },
+  zh: { stt: "zh-CN", whisper: "zh", dir: "ltr" }
 };
 
 type Ctx = {
