@@ -54,6 +54,7 @@ export function useSync(refreshLocalView: () => void) {
         if (!pullError && serverTasks) {
           const tasksToUpsert: Task[] = serverTasks.map(row => ({
             id: row.id,
+            user_id: row.user_id,
             rawText: row.raw_text,
             cleanText: row.clean_text,
             status: row.status as any,
