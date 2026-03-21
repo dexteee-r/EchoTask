@@ -261,6 +261,7 @@ export default function App() {
             apiKey={apiKey}
             onToggleCloudAI={() => setAllowCloudAI(v => !v)}
             onApiKeyChange={setApiKey}
+            onImportDone={manager.refresh}
           />
         )}
       </main>

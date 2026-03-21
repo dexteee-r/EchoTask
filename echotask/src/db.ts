@@ -153,9 +153,13 @@ export async function exportTasksAsJSON(): Promise<string> {
   const all = db ? await db.tasks.toArray() : lsRead();
   return JSON.stringify({ version: 1, tasks: all }, null, 2);
 }
-export async function importTasksFromJSON(json: string): Promise<number> {
+export async function importTasksFromJSON(json: string, userId?: string): Promise<number> {
   const parsed = JSON.parse(json);
   const items: Task[] = Array.isArray(parsed?.tasks) ? parsed.tasks : [];
-  if (db) { await db.tasks.bulkPut(items); return items.length; }
-  const arr = lsRead(); lsWrite([...items, ...arr]); return items.length;
+  // En mode cloud : assigner user_id et marquer dirty pour que la sync les pousse
+  const toImport = userId
+    ? items.map(t => ({ ...t, user_id: userId, isDirty: true }))
+    : items;
+  if (db) { await db.tasks.bulkPut(toImport); return toImport.length; }
+  const arr = lsRead(); lsWrite([...toImport, ...arr]); return toImport.length;
 }
