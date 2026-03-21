@@ -1,10 +1,34 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
+
+/* === FOND VIVANT — "L'Éther" === */
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background-color: var(--color-bg);
+  font-family: var(--font-family);
   color: var(--color-text);
+  /* Gradient éthéré — indigo-poudré vers rose-poudré */
+  background: linear-gradient(160deg, #eef0ff 0%, #fafafb 45%, #f5f0ff 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
+
+/* Dark mode background */
+[data-theme="dark"] body {
+  background: linear-gradient(160deg, #0f0f1a 0%, #09090b 50%, #120912 100%);
+  background-attachment: fixed;
+}
+
+/* Grain organique — texture papier haut de gamme */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
 button {
   padding: 10px 12px;
   border-radius: 8px;
@@ -30,7 +54,7 @@ h1, h3 { margin: 0; font-weight: 700; }
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
 }
 .input-row { display: flex; gap: 8px; align-items: center; }
 .badge {

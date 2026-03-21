@@ -1,176 +1,76 @@
 // src/ui/EmptyState.tsx
 import React from 'react';
+import { motion } from 'framer-motion';
 
 interface EmptyStateProps {
-  // Labels traduits
   title: string;
   microphoneHint: string;
   keyboardHint: string;
   improveHint: string;
 }
 
-/**
- * EmptyState - État vide de la liste
- * 
- * Affiche des instructions quand aucune tâche n'existe
- * Guide l'utilisateur sur comment utiliser l'app
- */
-export default function EmptyState({
-  title,
-  microphoneHint,
-  keyboardHint,
-  improveHint
-}: EmptyStateProps) {
-  
+export default function EmptyState({ title, microphoneHint, keyboardHint, improveHint }: EmptyStateProps) {
   return (
-    <div 
-      className="fade-in-scale"
-      style={{
-        textAlign: 'center',
-        padding: 'var(--space-8)',
-        background: 'var(--color-bg-secondary)',
-        borderRadius: 'var(--radius-lg)',
-        border: '2px dashed var(--color-border)',
-        marginTop: 'var(--space-4)'
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      style={{ textAlign: 'center', paddingTop: 'var(--space-12)' }}
     >
-      {/* Icône principale */}
-      <div style={{ 
-        fontSize: '4rem',
-        marginBottom: 'var(--space-4)',
-        animation: 'bounce 1s ease infinite'
-      }}>
-        📋
+      {/* SVG flottant */}
+      <div className="empty-state-svg" style={{ marginBottom: 'var(--space-8)' }}>
+        <svg width="64" height="64" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="13" y="18" width="44" height="48" rx="7" stroke="var(--color-text-tertiary)" strokeWidth="1.5"/>
+          <rect x="25" y="12" width="22" height="12" rx="4" stroke="var(--color-text-tertiary)" strokeWidth="1.5"/>
+          <line x1="21" y1="34" x2="51" y2="34" stroke="var(--color-text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="21" y1="44" x2="45" y2="44" stroke="var(--color-text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="21" y1="54" x2="48" y2="54" stroke="var(--color-text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
+          <circle cx="55" cy="19" r="9" fill="var(--color-primary-light)"/>
+          <circle cx="55" cy="19" r="9" stroke="var(--color-primary)" strokeWidth="1.5"/>
+          <line x1="55" y1="15" x2="55" y2="23" stroke="var(--color-primary)" strokeWidth="1.8" strokeLinecap="round"/>
+          <line x1="51" y1="19" x2="59" y2="19" stroke="var(--color-primary)" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
       </div>
 
-      {/* Titre */}
-      <h3 style={{ 
-        margin: 0,
-        fontSize: 'var(--text-xl)',
-        fontWeight: 'var(--font-bold)',
-        color: 'var(--color-text)',
-        marginBottom: 'var(--space-4)'
+      <p style={{
+        fontFamily: 'var(--font-serif)',
+        fontStyle: 'italic',
+        fontSize: 'clamp(1.1rem, 3vw, 1.4rem)',
+        fontWeight: 400,
+        color: 'var(--color-text-secondary)',
+        marginBottom: 'var(--space-8)',
+        letterSpacing: '-0.01em',
       }}>
         {title}
-      </h3>
-
-      {/* Instructions */}
-      <div style={{ 
-        maxWidth: 400,
-        margin: '0 auto',
-        textAlign: 'left'
-      }}>
-        {/* Hint 1 : Microphone */}
-        <div className="stagger-item" style={{ 
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-          marginBottom: 'var(--space-3)',
-          padding: 'var(--space-3)',
-          background: 'var(--color-surface)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <div style={{ 
-            fontSize: '1.5rem',
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--color-primary-light)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-            🎤
-          </div>
-          <p style={{ 
-            margin: 0,
-            fontSize: 'var(--text-sm)',
-            color: 'var(--color-text-secondary)',
-            lineHeight: 'var(--leading-relaxed)'
-          }}>
-            {microphoneHint}
-          </p>
-        </div>
-
-        {/* Hint 2 : Clavier */}
-        <div className="stagger-item" style={{ 
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-          marginBottom: 'var(--space-3)',
-          padding: 'var(--space-3)',
-          background: 'var(--color-surface)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <div style={{ 
-            fontSize: '1.5rem',
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--color-secondary-light)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-            ⌨️
-          </div>
-          <p style={{ 
-            margin: 0,
-            fontSize: 'var(--text-sm)',
-            color: 'var(--color-text-secondary)',
-            lineHeight: 'var(--leading-relaxed)'
-          }}>
-            {keyboardHint}
-          </p>
-        </div>
-
-        {/* Hint 3 : Améliorer */}
-        <div className="stagger-item" style={{ 
-          display: 'flex',
-          alignItems: 'center',
-          gap: 'var(--space-3)',
-          padding: 'var(--space-3)',
-          background: 'var(--color-surface)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <div style={{ 
-            fontSize: '1.5rem',
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--color-accent-light)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-            ✨
-          </div>
-          <p style={{ 
-            margin: 0,
-            fontSize: 'var(--text-sm)',
-            color: 'var(--color-text-secondary)',
-            lineHeight: 'var(--leading-relaxed)'
-          }}>
-            {improveHint}
-          </p>
-        </div>
-      </div>
-
-      {/* Encouragement */}
-      <p style={{ 
-        marginTop: 'var(--space-4)',
-        fontSize: 'var(--text-sm)',
-        color: 'var(--color-text-tertiary)',
-        fontStyle: 'italic'
-      }}>
-        💡 Commencez dès maintenant !
       </p>
-    </div>
+
+      {/* Hints — minimalistes, espacés */}
+      <div style={{ maxWidth: 360, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', textAlign: 'left' }}>
+        {[
+          { icon: '🎤', text: microphoneHint },
+          { icon: '⌨️', text: keyboardHint },
+          { icon: '✦', text: improveHint },
+        ].map(({ icon, text }, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 + i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}
+          >
+            <span style={{ fontSize: '1rem', opacity: 0.5, flexShrink: 0, marginTop: 2 }}>{icon}</span>
+            <p style={{
+              margin: 0,
+              fontSize: 'var(--text-sm)',
+              color: 'var(--color-text-tertiary)',
+              lineHeight: '1.6',
+              fontWeight: 'var(--font-normal)',
+            }}>
+              {text}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
   );
 }
