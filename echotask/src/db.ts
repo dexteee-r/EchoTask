@@ -4,13 +4,17 @@ import { Task, TaskFilter } from './types';
 import { STORAGE_KEYS, APP_CONFIG, SEPARATORS } from './constants';
 import { nowIso, shortId } from './utils';
 
-/** ID safe: marche même sans crypto.randomUUID (HTTP, iOS PWA) */
+/** ID safe: génère toujours un UUID v4 valide, même sans crypto.randomUUID */
 export function safeId(): string {
   try {
     // @ts-ignore
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   } catch {}
-  return SEPARATORS.ID_PREFIX + shortId();
+  // Fallback UUID v4 compatible (requis pour Supabase UUID primary key)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
 }
 
 /** Détecte si IndexedDB est disponible (pas en Private mode iOS < 16, etc.) */
