@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { createTask, listTasks, removeTask, toggleDone, updateTask, safeId } from '../db';
 import { Task, SubTask } from '../types';
 import { STORAGE_KEYS } from '../constants';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Utilitaire : génère un ISO timestamp
@@ -47,6 +48,8 @@ function saveOrder(order: string[]) {
  * @returns {Object} Méthodes et état pour gérer les tâches
  */
 export function useTaskManager() {
+  const { user, mode } = useAuth();
+  
   // État des tâches
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -91,7 +94,7 @@ export function useTaskManager() {
    * (statut, recherche texte, tags, ordre personnalisé)
    */
   async function refresh() {
-    const rows = await listTasks(filter);
+    const rows = await listTasks(filter, user?.id);
     const q = search.trim().toLowerCase();
     const tags = activeFilterTags();
 
@@ -114,14 +117,18 @@ export function useTaskManager() {
   // Rafraîchir quand les filtres ou l'ordre changent
   useEffect(() => {
     refresh();
-  }, [filter, search, tagFilter, customOrder]);
+  }, [filter, search, tagFilter, customOrder, user?.id]);
 
   /**
    * Ajoute une nouvelle tâche — la place en tête de l'ordre personnalisé
    */
   async function add(raw: string, cleanText?: string | null, tagsStr?: string, due?: string | null) {
+    // En mode cloud, on exige un user connecté
+    if (mode === 'cloud' && !user) return;
+
     const task: Task = {
       id: safeId(),
+      ...(user ? { user_id: user.id } : {}),
       rawText: raw,
       cleanText: cleanText ?? null,
       status: 'active',

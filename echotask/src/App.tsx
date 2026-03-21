@@ -7,11 +7,13 @@ import LanguageSwitch from './ui/LanguageSwitch';
 import AddTaskForm from './ui/AddTaskForm';
 import TaskList from './ui/TaskList';
 import FilterBar from './ui/FilterBar';
-import CloudConfig from './ui/CloudConfig';
 import VoiceButtons from './ui/VoiceButtons';
 import ThemeToggle from './ui/ThemeToggle';
 import EmptyState from './ui/EmptyState';
 import TaskStats from './ui/TaskStats';
+import SettingsModal from './ui/SettingsModal';
+import AuthScreen from './ui/AuthScreen';
+import { useAuth } from './contexts/AuthContext';
 
 // Chargement différé — code splitting pour les composants conditionnels
 const DraftEditor   = lazy(() => import('./ui/DraftEditor'));
@@ -20,100 +22,72 @@ const EditTaskModal = lazy(() => import('./ui/EditTaskModal'));
 import { useTaskManager } from './hooks/useTaskManager';
 import { useSTT } from './hooks/useSTT';
 import { useDraft } from './hooks/useDraft';
+import { useSync } from './lib/sync';
 
 export default function App() {
-  // i18n
+  const { user, isLoading: authLoading, mode } = useAuth();
   const { t, lang } = useI18n();
   const meta = LANG_META[lang];
 
-  // Config Cloud (persistée)
-  const [allowCloud, setAllowCloud] = useState(() => 
+  // Config Cloud AI (persistée)
+  const [allowCloudAI, setAllowCloudAI] = useState(() => 
     localStorage.getItem("allowCloud") === "1"
   );
   const [apiKey, setApiKey] = useState(() => 
     localStorage.getItem("apiKey") || ""
   );
 
-  const [showWelcome, setShowWelcome] = useState(() => {
-    return !localStorage.getItem('hasVisited');
-  });
-  const handleCloseWelcome = () => {
-    setShowWelcome(false);
-    localStorage.setItem('hasVisited', 'true');
-  };
-
+  const [showSettings, setShowSettings] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('hasVisited'));
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
-    localStorage.setItem("allowCloud", allowCloud ? "1" : "0");
-  }, [allowCloud]);
+    localStorage.setItem("allowCloud", allowCloudAI ? "1" : "0");
+  }, [allowCloudAI]);
 
   useEffect(() => {
     localStorage.setItem("apiKey", apiKey);
   }, [apiKey]);
 
   // Hooks métier
-
   const manager = useTaskManager();
   const draft = useDraft();
+  const { isSyncing } = useSync(manager.refresh);
+
   const stt = useSTT(
     (text) => draft.updateDraft(text, true),
     meta.stt,
     meta.whisper,
     apiKey,
     (code) => {
-      if (code === 'service-not-allowed') {
-        toast(t("toast.sttBlocked"), { type: 'error' });
-      } else if (code === 'not-allowed') {
-        toast(t("toast.micPermission"), { type: 'error' });
-      } else {
-        toast(t("toast.sttUnsupported"), { type: 'info' });
-      }
+      if (code === 'service-not-allowed') toast(t("toast.sttBlocked"), { type: 'error' });
+      else if (code === 'not-allowed') toast(t("toast.micPermission"), { type: 'error' });
+      else toast(t("toast.sttUnsupported"), { type: 'info' });
     }
   );
 
-  // PWA Shortcuts — gérer les query params (?action=add, ?action=voice, ?filter=active)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const action = params.get('action');
-    const filterParam = params.get('filter');
-
-    if (filterParam === 'active') {
-      manager.setFilter('active');
-    }
-    if (action === 'add') {
-      // Focus sur le champ de saisie
-      setTimeout(() => {
-        const input = document.querySelector<HTMLInputElement>('input[placeholder]');
-        if (input) input.focus();
-      }, 300);
-    }
-    if (action === 'voice') {
-      // Lancer la dictée locale après un court délai
-      setTimeout(() => {
-        try { stt.startLocal(); } catch { /* ignore */ }
-      }, 500);
-    }
-
-    // Nettoyer l'URL sans recharger la page
-    if (action || filterParam) {
-      window.history.replaceState({}, '', '/');
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // PWA Badge — met à jour le badge avec le nombre de tâches actives
+  // Badge PWA
   useEffect(() => {
     const activeCount = manager.tasks.filter(t => t.status !== 'done').length;
     if ('setAppBadge' in navigator) {
-      if (activeCount > 0) {
-        (navigator as Navigator & { setAppBadge: (n: number) => Promise<void> })
-          .setAppBadge(activeCount).catch(() => {});
-      } else {
-        (navigator as Navigator & { clearAppBadge: () => Promise<void> })
-          .clearAppBadge?.().catch(() => {});
-      }
+      if (activeCount > 0) (navigator as any).setAppBadge(activeCount).catch(() => {});
+      else (navigator as any).clearAppBadge?.().catch(() => {});
     }
   }, [manager.tasks]);
+
+  // Chargement initial de l'auth (seulement en mode cloud)
+  if (mode === 'cloud' && authLoading) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}>
+        <div className="loader"></div>
+      </div>
+    );
+  }
+
+  // En mode cloud : connexion obligatoire
+  if (mode === 'cloud' && !user) {
+    return <AuthScreen />;
+  }
 
   // Handlers
   async function handleAddTask(text: string, tags: string, due?: string | null) {
@@ -121,268 +95,167 @@ export default function App() {
     toast(t("toast.added"), { type: 'success' });
   }
 
-  async function handleToggleDone(id: string) {
-    await manager.toggle(id);
-  }
-
-  async function handleDelete(id: string) {
-    await manager.remove(id);
-    toast(t("toast.deleted"), { type: 'info' });
-  }
-
-  function handleStartLocal() {
-    try {
-      stt.startLocal();
-    } catch {
-      toast(t("toast.sttUnsupported"), { type: 'info' });
-    }
-  }
-
-  async function handleStartCloud() {
-    try {
-      await stt.startCloud();
-    } catch {
-      toast(t("toast.recStartError"), { type: 'error' });
-    }
-  }
-
-  async function handleImprove() {
-    try {
-      if (allowCloud && apiKey) {
-        await draft.improveCloud(apiKey, lang, 'neutral');
-      } else {
-        draft.improveLocal();
-      }
-    } catch {
-      toast(t("toast.rewriteError"), { type: 'error' });
-    }
-  }
-
-  async function handleSaveDraft() {
-    if (!draft.hasContent) {
-      toast(t("toast.nothingToSave"), { type: 'info' });
-      return;
-    }
-    try {
-      const content = draft.getContent();
-      await manager.add(content.raw, content.clean, content.tags);
-      draft.clear();
-      toast(t("toast.saved"), { type: 'success' });
-    } catch {
-      toast(t("toast.rewriteError"), { type: 'error' });
-    }
-  }
-
-  function handleTagClick(tag: string) {
-    const current = manager.tagFilter.split(',').map(t => t.trim()).filter(Boolean);
-    if (current.includes(tag)) {
-      manager.setTagFilter(current.filter(t => t !== tag).join(', '));
-    } else {
-      manager.setTagFilter(tag);
-    }
-  }
-
-  function handleEdit(id: string) {
-    const taskToEdit = manager.tasks.find(t => t.id === id);
-    if (taskToEdit) {
-      setEditingTask(taskToEdit);
-    }
-  }
-  async function handleSaveEdit(updatedTask: Task) {
-    await manager.update(updatedTask);
-    setEditingTask(null);
-    toast(t("toast.updated"), { type: 'success' });
-  }
-  async function handleImproveInEdit(): Promise<string> {
-    if (!editingTask) return '';
-    try {
-      if (allowCloud && apiKey) {
-        return await cloudRewrite(editingTask.rawText, apiKey, lang, 'neutral');
-      } else {
-        return localRewrite(editingTask.rawText);
-      }
-    } catch {
-      toast(t("toast.rewriteError"), { type: 'error' });
-      return '';
-    }
-  }
-
   return (
-    <div className="app-container">
+    <div className="app-container fade-in">
       <ToastHost />
 
       {/* Header */}
       <header className="app-header" role="banner">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <h1 style={{ margin: 0 }}>{t("app.title")}</h1>
-          <span style={{
-            fontSize: 'var(--text-sm)',
-            color: 'var(--color-text-secondary)',
-            fontWeight: 'var(--font-medium)',
-            textTransform: 'capitalize',
-          }}>
-            {new Intl.DateTimeFormat(lang === 'ar' ? 'ar' : lang, {
-              weekday: 'long', day: 'numeric', month: 'long'
-            }).format(new Date())}
+          <h1 style={{ margin: 0, fontSize: 'var(--text-lg)' }}>{t("app.title")}</h1>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>
+            {new Intl.DateTimeFormat(lang, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}
           </span>
         </div>
 
         <div className="app-header-end">
+          {mode === 'cloud' && isSyncing && <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>↻</span>}
           <select value={manager.filter} onChange={e=>manager.setFilter(e.target.value as any)} className="badge" aria-label={t("filter.label")}>
             <option value="all">{t("filter.all")}</option>
             <option value="active">{t("filter.active")}</option>
             <option value="done">{t("filter.done")}</option>
           </select>
 
-          <CloudConfig
-            allowCloud={allowCloud}
-            apiKey={apiKey}
-            onToggleCloud={() => setAllowCloud(v => !v)}
-            onApiKeyChange={setApiKey}
-            cloudOnLabel={t("cloud.on")}
-            cloudOffLabel={t("cloud.off")}
-            apiKeyPlaceholder={t("api.key.placeholder")}
-            warningMessage={t("api.key.placeholder")}
-          />
+          <button onClick={() => setShowSettings(true)} className="btn-icon" aria-label="Paramètres">⚙️</button>
           <ThemeToggle />
           <LanguageSwitch />
         </div>
       </header>
 
-      {/* Contenu principal */}
       <main>
-
-      {/* Filtres */}
-      <FilterBar
-        search={manager.search}
-        tagFilter={manager.tagFilter}
-        onSearchChange={manager.setSearch}
-        onTagFilterChange={manager.setTagFilter}
-        searchPlaceholder={t("search.placeholder")}
-        tagFilterPlaceholder={t("tags.filter.placeholder")}
-      />
-
-      {/* Stats */}
-      <TaskStats
-        active={manager.tasks.filter(t => t.status !== 'done').length}
-        done={manager.tasks.filter(t => t.status === 'done').length}
-        activeLabel={t("stats.active")}
-        doneLabel={t("stats.done")}
-      />
-
-      {/* Ajout rapide */}
-      <AddTaskForm
-        onSubmit={handleAddTask}
-        placeholderText={t("input.placeholder")}
-        placeholderTags={t("input.tags.placeholder")}
-        dueLabel={t("due.label")}
-        buttonLabel={t("btn.add")}
-      />
-
-      {/* Boutons vocaux */}
-      <VoiceButtons
-        listeningLocal={stt.listeningLocal}
-        listeningCloud={stt.listeningCloud}
-        sttSupported={stt.isSupported}
-        onStartLocal={handleStartLocal}
-        onStopLocal={() => stt.stopLocal()}
-        onStartCloud={handleStartCloud}
-        onStopCloud={() => stt.stopCloud()}
-        localLabel={t("btn.local")}
-        cloudLabel={t("btn.cloud")}
-        unsupportedTooltip={t("toast.sttUnsupported")}
-      />
-
-      {/* Brouillon */}
-      {draft.draft && (
-        <Suspense fallback={null}>
-        <DraftEditor
-          draft={draft.draft}
-          clean={draft.clean}
-          tags={draft.tags}
-          onDraftChange={draft.setDraft}
-          onCleanChange={draft.setClean}
-          onTagsChange={draft.setTags}
-          onImprove={handleImprove}
-          onSave={handleSaveDraft}
-          onCancel={() => draft.clear()}
-          title={t("draft.title")}
-          rawLabel={t("raw")}
-          cleanLabel={t("clean")}
-          tagsPlaceholder={t("draft.tags.placeholder")}
-          improveLabel={t("btn.improve")}
-          saveLabel={t("btn.save")}
-          cancelLabel={t("btn.cancel")}
+        <FilterBar
+          search={manager.search}
+          tagFilter={manager.tagFilter}
+          onSearchChange={manager.setSearch}
+          onTagFilterChange={manager.setTagFilter}
+          searchPlaceholder={t("search.placeholder")}
+          tagFilterPlaceholder={t("tags.filter.placeholder")}
         />
-        </Suspense>
-      )}
 
-      {/* === Liste des tâches === */}
-      <TaskList
-        tasks={manager.tasks}
-        onToggleDone={handleToggleDone}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-        onTagClick={handleTagClick}
-        onAddSubtask={(taskId, text) => manager.addSubtask(taskId, text)}
-        onToggleSubtask={(taskId, subId) => manager.toggleSubtask(taskId, subId)}
-        onRemoveSubtask={(taskId, subId) => manager.removeSubtask(taskId, subId)}
-        onReorder={(ids) => manager.reorderTasks(ids)}
-        emptyMessage={t("empty")}
-        toggleLabel={t("filter.done")}
-        subtaskToggleLabel={t("subtask.toggle")}
-        subtaskPlaceholder={t("subtask.placeholder")}
-        dragLabel={t("task.drag")}
-      />
-
-      {/* 🆕 Empty State (si liste vide) */}
-      {manager.tasks.length === 0 && (
-        <EmptyState
-          title={t("empty.title")}
-          microphoneHint={t("empty.microphoneHint")}
-          keyboardHint={t("empty.keyboardHint")}
-          improveHint={t("empty.improveHint")}
+        <TaskStats
+          active={manager.tasks.filter(t => t.status !== 'done').length}
+          done={manager.tasks.filter(t => t.status === 'done').length}
+          activeLabel={t("stats.active")}
+          doneLabel={t("stats.done")}
         />
-      )}
 
-      {/* 🆕 Welcome Modal (première visite) */}
-      {showWelcome && (
-        <Suspense fallback={null}>
-        <WelcomeModal
-          onClose={handleCloseWelcome}
-          title={t("welcome.title")}
-          subtitle={t("welcome.subtitle")}
-          step1={t("welcome.step1")}
-          step2={t("welcome.step2")}
-          step3={t("welcome.step3")}
-          startButton={t("welcome.start")}
-          learnMoreButton={t("welcome.learnMore")}
-        />
-        </Suspense>
-      )}
-      {editingTask && (
-        <Suspense fallback={null}>
-        <EditTaskModal
-          task={editingTask}
-          onSave={handleSaveEdit}
-          onCancel={() => setEditingTask(null)}
-          onImprove={handleImproveInEdit}
-          title={t("edit.title")}
-          rawLabel={t("raw")}
-          cleanLabel={t("clean")}
-          tagsLabel={t("tags")}
-          tagsPlaceholder={t("edit.tagsPlaceholder")}
+        <AddTaskForm
+          onSubmit={handleAddTask}
+          placeholderText={t("input.placeholder")}
+          placeholderTags={t("input.tags.placeholder")}
           dueLabel={t("due.label")}
-          duePlaceholder={t("due.placeholder")}
-          filePathLabel={t("task.filepath")}
-          filePathPlaceholder={t("task.filepath.placeholder")}
-          saveButton={t("btn.save")}
-          cancelButton={t("btn.cancel")}
-          improveButton={t("btn.improve")}
+          buttonLabel={t("btn.add")}
         />
-        </Suspense>
-      )}
 
+        <VoiceButtons
+          listeningLocal={stt.listeningLocal}
+          listeningCloud={stt.listeningCloud}
+          sttSupported={stt.isSupported}
+          onStartLocal={() => stt.startLocal()}
+          onStopLocal={() => stt.stopLocal()}
+          onStartCloud={() => stt.startCloud()}
+          onStopCloud={() => stt.stopCloud()}
+          localLabel={t("btn.local")}
+          cloudLabel={t("btn.cloud")}
+          unsupportedTooltip={t("toast.sttUnsupported")}
+        />
+
+        {draft.draft && (
+          <Suspense fallback={null}>
+            <DraftEditor
+              draft={draft.draft}
+              clean={draft.clean}
+              tags={draft.tags}
+              onDraftChange={draft.setDraft}
+              onCleanChange={draft.setClean}
+              onTagsChange={draft.setTags}
+              onImprove={async () => {
+                if (allowCloudAI && apiKey) await draft.improveCloud(apiKey, lang);
+                else draft.improveLocal();
+              }}
+              onSave={async () => {
+                const c = draft.getContent();
+                await manager.add(c.raw, c.clean, c.tags);
+                draft.clear();
+                toast(t("toast.saved"), { type: 'success' });
+              }}
+              onCancel={() => draft.clear()}
+              title={t("draft.title")}
+              rawLabel={t("raw")}
+              cleanLabel={t("clean")}
+              tagsPlaceholder={t("draft.tags.placeholder")}
+              improveLabel={t("btn.improve")}
+              saveLabel={t("btn.save")}
+              cancelLabel={t("btn.cancel")}
+            />
+          </Suspense>
+        )}
+
+        <TaskList
+          tasks={manager.tasks}
+          onToggleDone={manager.toggle}
+          onDelete={manager.remove}
+          onEdit={(id) => setEditingTask(manager.tasks.find(t => t.id === id) || null)}
+          onTagClick={(tag) => manager.setTagFilter(tag)}
+          onAddSubtask={manager.addSubtask}
+          onToggleSubtask={manager.toggleSubtask}
+          onRemoveSubtask={manager.removeSubtask}
+          onReorder={manager.reorderTasks}
+          emptyMessage={t("empty")}
+          toggleLabel={t("filter.done")}
+          subtaskToggleLabel={t("subtask.toggle")}
+          subtaskPlaceholder={t("subtask.placeholder")}
+          dragLabel={t("task.drag")}
+        />
+
+        {manager.tasks.length === 0 && (
+          <EmptyState
+            title={t("empty.title")}
+            microphoneHint={t("empty.microphoneHint")}
+            keyboardHint={t("empty.keyboardHint")}
+            improveHint={t("empty.improveHint")}
+          />
+        )}
+
+        {showWelcome && (
+          <Suspense fallback={null}>
+            <WelcomeModal
+              onClose={() => { setShowWelcome(false); localStorage.setItem('hasVisited', 'true'); }}
+              title={t("welcome.title")} subtitle={t("welcome.subtitle")}
+              step1={t("welcome.step1")} step2={t("welcome.step2")} step3={t("welcome.step3")}
+              startButton={t("welcome.start")} learnMoreButton={t("welcome.learnMore")}
+            />
+          </Suspense>
+        )}
+
+        {editingTask && (
+          <Suspense fallback={null}>
+            <EditTaskModal
+              task={editingTask}
+              onSave={async (t) => { await manager.update(t); setEditingTask(null); toast(t("toast.updated"), { type: 'success' }); }}
+              onCancel={() => setEditingTask(null)}
+              onImprove={async () => {
+                if (allowCloudAI && apiKey) return await cloudRewrite(editingTask.rawText, apiKey, lang);
+                return localRewrite(editingTask.rawText);
+              }}
+              title={t("edit.title")} rawLabel={t("raw")} cleanLabel={t("clean")}
+              tagsLabel={t("tags")} tagsPlaceholder={t("edit.tagsPlaceholder")}
+              dueLabel={t("due.label")} duePlaceholder={t("due.placeholder")}
+              filePathLabel={t("task.filepath")} filePathPlaceholder={t("task.filepath.placeholder")}
+              saveButton={t("btn.save")} cancelButton={t("btn.cancel")} improveButton={t("btn.improve")}
+            />
+          </Suspense>
+        )}
+
+        {showSettings && (
+          <SettingsModal
+            onClose={() => setShowSettings(false)}
+            allowCloudAI={allowCloudAI}
+            apiKey={apiKey}
+            onToggleCloudAI={() => setAllowCloudAI(v => !v)}
+            onApiKeyChange={setApiKey}
+          />
+        )}
       </main>
     </div>
   );

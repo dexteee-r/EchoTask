@@ -42,6 +42,16 @@ export type Task = {
   
   /** Date de dernière mise à jour ISO */
   updatedAt: string;
+
+  // --- Champs pour la synchronisation Cloud ---
+  /** Indicateur de suppression logique (soft delete) pour la synchro */
+  deleted?: boolean;
+
+  /** Indicateur de modification locale non synchronisée vers le serveur */
+  isDirty?: boolean;
+
+  /** ID de l'utilisateur propriétaire (utile en mode Cloud) */
+  user_id?: string;
 };
 
 /**
