@@ -67,10 +67,16 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
+
+  /* Glass surfaces */
+  --color-glass: rgba(255, 255, 255, 0.88);
+  --color-glass-border: rgba(0, 0, 0, 0.06);
+  --color-glass-sm: rgba(255, 255, 255, 0.80);
   
   /* Border Radius */
   --radius-sm: 5px;
@@ -144,6 +150,11 @@
   --shadow-md: 0 8px 30px 0 rgba(0, 0, 0, 0.40);
   --shadow-lg: 0 16px 48px 0 rgba(0, 0, 0, 0.45);
   --shadow-xl: 0 24px 64px 0 rgba(0, 0, 0, 0.50);
+
+  /* Glass surfaces — dark */
+  --color-glass: rgba(28, 28, 30, 0.88);
+  --color-glass-border: rgba(255, 255, 255, 0.07);
+  --color-glass-sm: rgba(40, 40, 42, 0.80);
 }
 
 /* === GLOBAL RESETS === */
@@ -449,7 +460,7 @@ body {
 .zen-main {
   max-width: 680px;
   margin: 0 auto;
-  padding: var(--space-16) var(--space-6) 160px;
+  padding: var(--space-16) var(--space-6) calc(160px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Header centré */

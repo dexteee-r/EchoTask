@@ -37,7 +37,7 @@ export default function VoiceButtons({
   return (
     <div style={{
       position: 'fixed',
-      bottom: 48,
+      bottom: 'calc(48px + env(safe-area-inset-bottom, 0px))',
       left: '50%',
       transform: 'translateX(-50%)',
       display: 'flex',
@@ -61,8 +61,8 @@ export default function VoiceButtons({
           width: 56, height: 56,
           borderRadius: '50%',
           background: listeningLocal
-            ? 'rgba(28, 28, 30, 0.9)'
-            : 'rgba(255, 255, 255, 0.80)',
+            ? 'var(--color-text)'
+            : 'var(--color-glass-sm)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255,255,255,0.5)',
@@ -124,8 +124,8 @@ export default function VoiceButtons({
           width: 56, height: 56,
           borderRadius: '50%',
           background: listeningCloud
-            ? 'rgba(129, 140, 248, 0.9)'
-            : 'rgba(255, 255, 255, 0.80)',
+            ? 'var(--color-primary)'
+            : 'var(--color-glass-sm)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255,255,255,0.5)',
