@@ -1,5 +1,6 @@
 // src/ui/TaskList.tsx
 import React from 'react';
+import { AnimatePresence } from 'framer-motion';
 import {
   DndContext,
   closestCenter,
@@ -53,12 +54,8 @@ export default function TaskList({
 }: TaskListProps) {
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   function handleDragEnd(event: DragEndEvent) {
@@ -67,48 +64,36 @@ export default function TaskList({
     const oldIndex = tasks.findIndex(t => t.id === active.id);
     const newIndex = tasks.findIndex(t => t.id === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
-    const reordered = arrayMove(tasks, oldIndex, newIndex);
-    onReorder?.(reordered.map(t => t.id));
+    onReorder?.(arrayMove(tasks, oldIndex, newIndex).map(t => t.id));
   }
 
-  if (tasks.length === 0) {
-    return (
-      <p style={{ color: '#666', marginTop: 16 }}>
-        {emptyMessage}
-      </p>
-    );
-  }
+  if (tasks.length === 0) return null;
 
   return (
-    <section style={{ marginTop: 16 }}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={tasks.map(t => t.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {tasks.map((task, idx) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                index={idx}
-                onToggleDone={onToggleDone}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onTagClick={onTagClick}
-                onAddSubtask={onAddSubtask}
-                onToggleSubtask={onToggleSubtask}
-                onRemoveSubtask={onRemoveSubtask}
-                toggleLabel={toggleLabel}
-                subtaskToggleLabel={subtaskToggleLabel}
-                subtaskPlaceholder={subtaskPlaceholder}
-                dragLabel={dragLabel}
-              />
-            ))}
+    <section style={{ marginTop: 'var(--space-10)' }}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <AnimatePresence mode="popLayout" initial={false}>
+              {tasks.map((task, idx) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  index={idx}
+                  onToggleDone={onToggleDone}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onTagClick={onTagClick}
+                  onAddSubtask={onAddSubtask}
+                  onToggleSubtask={onToggleSubtask}
+                  onRemoveSubtask={onRemoveSubtask}
+                  toggleLabel={toggleLabel}
+                  subtaskToggleLabel={subtaskToggleLabel}
+                  subtaskPlaceholder={subtaskPlaceholder}
+                  dragLabel={dragLabel}
+                />
+              ))}
+            </AnimatePresence>
           </ul>
         </SortableContext>
       </DndContext>

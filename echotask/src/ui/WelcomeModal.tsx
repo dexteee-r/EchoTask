@@ -1,9 +1,9 @@
 // src/ui/WelcomeModal.tsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface WelcomeModalProps {
   onClose: () => void;
-  // Labels traduits
   title: string;
   subtitle: string;
   step1: string;
@@ -13,212 +13,153 @@ interface WelcomeModalProps {
   learnMoreButton: string;
 }
 
-/**
- * WelcomeModal - Écran d'accueil première visite
- * 
- * Affiche :
- * - Titre et description
- * - 3 étapes principales
- * - Boutons d'action
- * 
- * S'affiche uniquement à la première visite (localStorage)
- */
+const steps = [
+  { icon: '✦', key: 'step1' as const },
+  { icon: '◎', key: 'step2' as const },
+  { icon: '◇', key: 'step3' as const },
+];
+
 export default function WelcomeModal({
   onClose,
-  title,
-  subtitle,
-  step1,
-  step2,
-  step3,
-  startButton,
-  learnMoreButton
+  title, subtitle,
+  step1, step2, step3,
+  startButton, learnMoreButton,
 }: WelcomeModalProps) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Petit délai pour l'animation
-    setTimeout(() => setIsVisible(true), 100);
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300); // Attendre la fin de l'animation
-  };
+  const stepTexts = { step1, step2, step3 };
 
   return (
-    <>
+    <AnimatePresence>
       {/* Backdrop */}
-      <div 
-        className={`backdrop ${isVisible ? 'fade-in' : 'fade-out'}`}
-        onClick={handleClose}
+      <motion.div
+        key="welcome-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.18)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 1400,
+        }}
       />
 
-      {/* Modal */}
-      <div className="modal">
-        <div className={`modal-content ${isVisible ? 'fade-in-scale' : 'fade-out-scale'}`}>
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
-            <div style={{ 
-              fontSize: '3rem', 
-              marginBottom: 'var(--space-3)',
-              animation: 'bounce 0.6s ease'
-            }}>
-            </div>
-            <h2 style={{ 
-              margin: 0,
-              fontSize: 'var(--text-2xl)',
-              fontWeight: 'var(--font-bold)',
-              color: 'var(--color-text)',
-              marginBottom: 'var(--space-2)'
-            }}>
-              {title}
-            </h2>
-            <p style={{ 
-              margin: 0,
-              fontSize: 'var(--text-base)',
-              color: 'var(--color-text-secondary)',
-              lineHeight: 'var(--leading-relaxed)'
-            }}>
-              {subtitle}
-            </p>
-          </div>
-
-          {/* Steps */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
-            {/* Step 1 */}
-            <div className="stagger-item" style={{ 
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--space-3)',
-              marginBottom: 'var(--space-4)',
-              padding: 'var(--space-3)',
-              background: 'var(--color-bg-secondary)',
-              borderRadius: 'var(--radius-lg)',
-            }}>
-              <div style={{ 
-                fontSize: '2rem',
-                flexShrink: 0,
-              }}>
-                📝
-              </div>
-              <div>
-                <h3 style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-base)',
-                  fontWeight: 'var(--font-semibold)',
-                  color: 'var(--color-text)',
-                  marginBottom: 'var(--space-1)'
-                }}>
-                  {step1.split(':')[0]}
-                </h3>
-                <p style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--color-text-secondary)',
-                  lineHeight: 'var(--leading-normal)'
-                }}>
-                  {step1.split(':')[1]}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="stagger-item" style={{ 
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--space-3)',
-              marginBottom: 'var(--space-4)',
-              padding: 'var(--space-3)',
-              background: 'var(--color-bg-secondary)',
-              borderRadius: 'var(--radius-lg)',
-            }}>
-              <div style={{ 
-                fontSize: '2rem',
-                flexShrink: 0,
-              }}>
-                ✨
-              </div>
-              <div>
-                <h3 style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-base)',
-                  fontWeight: 'var(--font-semibold)',
-                  color: 'var(--color-text)',
-                  marginBottom: 'var(--space-1)'
-                }}>
-                  {step2.split(':')[0]}
-                </h3>
-                <p style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--color-text-secondary)',
-                  lineHeight: 'var(--leading-normal)'
-                }}>
-                  {step2.split(':')[1]}
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="stagger-item" style={{ 
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 'var(--space-3)',
-              padding: 'var(--space-3)',
-              background: 'var(--color-bg-secondary)',
-              borderRadius: 'var(--radius-lg)',
-            }}>
-              <div style={{ 
-                fontSize: '2rem',
-                flexShrink: 0,
-              }}>
-                ✅
-              </div>
-              <div>
-                <h3 style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-base)',
-                  fontWeight: 'var(--font-semibold)',
-                  color: 'var(--color-text)',
-                  marginBottom: 'var(--space-1)'
-                }}>
-                  {step3.split(':')[0]}
-                </h3>
-                <p style={{ 
-                  margin: 0,
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--color-text-secondary)',
-                  lineHeight: 'var(--leading-normal)'
-                }}>
-                  {step3.split(':')[1]}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div style={{ 
-            display: 'flex',
-            gap: 'var(--space-2)',
-            flexDirection: 'column'
+      {/* Card */}
+      <motion.div
+        key="welcome-card"
+        initial={{ opacity: 0, y: 24, scale: 0.97, filter: 'blur(8px)' }}
+        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+        exit={{ opacity: 0, y: 12, scale: 0.97 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'fixed',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 'min(92vw, 420px)',
+          background: 'rgba(255,255,255,0.88)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          borderRadius: 24,
+          border: '1px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.10)',
+          padding: 'var(--space-8)',
+          zIndex: 1401,
+        }}
+      >
+        {/* Titre */}
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-7)' }}>
+          <h2 style={{
+            margin: '0 0 var(--space-2)',
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontWeight: 400,
+            fontSize: 'clamp(1.6rem,5vw,2.2rem)',
+            letterSpacing: '-0.02em',
+            color: 'var(--color-text)',
           }}>
-            <button 
-              onClick={handleClose}
-              className="btn btn-primary ripple"
-              style={{ width: '100%' }}
-            >
-              {startButton}
-            </button>
-            <button 
-              onClick={handleClose}
-              className="btn btn-ghost"
-              style={{ width: '100%' }}
-            >
-              {learnMoreButton}
-            </button>
-          </div>
+            {title}
+          </h2>
+          <p style={{
+            margin: 0,
+            fontSize: 'var(--text-sm)',
+            color: 'var(--color-text-secondary)',
+            lineHeight: 1.6,
+          }}>
+            {subtitle}
+          </p>
         </div>
-      </div>
-    </>
+
+        {/* Steps */}
+        <div style={{ marginBottom: 'var(--space-7)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {steps.map(({ icon, key }, i) => {
+            const raw = stepTexts[key];
+            const [head, ...rest] = raw.split(':');
+            const body = rest.join(':').trim();
+            return (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 + i * 0.08, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}
+              >
+                <span style={{
+                  width: 22, height: 22, flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.7rem', color: 'var(--color-primary)', marginTop: 2,
+                }}>
+                  {icon}
+                </span>
+                <div>
+                  <p style={{ margin: '0 0 2px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--color-text)' }}>
+                    {head.trim()}
+                  </p>
+                  {body && (
+                    <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', lineHeight: 1.5 }}>
+                      {body}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          <motion.button
+            type="button"
+            onClick={onClose}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              width: '100%', padding: '11px var(--space-4)',
+              background: 'var(--color-text)', color: 'white',
+              border: 'none', borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)',
+              fontFamily: 'var(--font-family)', cursor: 'pointer',
+            }}
+          >
+            {startButton}
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={onClose}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              width: '100%', padding: '11px var(--space-4)',
+              background: 'transparent', color: 'var(--color-text-tertiary)',
+              border: 'none', borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-sm)',
+              fontFamily: 'var(--font-family)', cursor: 'pointer',
+            }}
+          >
+            {learnMoreButton}
+          </motion.button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
