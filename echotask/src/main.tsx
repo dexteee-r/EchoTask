@@ -4,6 +4,7 @@ import App from './App';
 import { I18nProvider } from './i18n';
 import { ThemeProvider } from './ThemeProvider';
 import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './ui/ErrorBoundary';
 import './design-system.css';
 import './style.css';
 import './animations.css';
@@ -20,13 +21,15 @@ function hideSplash() {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <AuthProvider>
-        <I18nProvider>
-          <App />
-        </I18nProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <I18nProvider>
+            <App />
+          </I18nProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 
