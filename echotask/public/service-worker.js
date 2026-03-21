@@ -1,4 +1,4 @@
-const CACHE = "echotask-v24";
+const CACHE = "echotask-v25";
 const ASSETS = [ "/", "/index.html", "/manifest.webmanifest" ];
 
 // install
@@ -27,7 +27,7 @@ self.addEventListener("fetch", (e) => {
         // cache uniquement les fichiers statiques (assets/ et root)
         if (/\.(js|css|png|svg|webp|ico|json)$/i.test(url.pathname) || url.pathname.startsWith("/assets/")) {
           const copy = res.clone();
-          caches.open("echotask-v1").then(c => c.put(e.request, copy));
+          caches.open(CACHE).then(c => c.put(e.request, copy));
         }
         return res;
       }).catch(() => caches.match("/"));
