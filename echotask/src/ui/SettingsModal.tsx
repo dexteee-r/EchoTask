@@ -166,11 +166,11 @@ export default function SettingsModal({
           maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
-          background: 'rgba(255,255,255,0.88)',
+          background: 'var(--color-glass)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
           borderRadius: 24,
-          border: '1px solid rgba(0,0,0,0.06)',
+          border: '1px solid var(--color-glass-border)',
           boxShadow: '0 24px 80px rgba(0,0,0,0.10)',
           zIndex: 1401,
         }}
