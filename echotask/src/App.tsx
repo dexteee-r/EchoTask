@@ -13,6 +13,7 @@ import EmptyState from './ui/EmptyState';
 import TaskStats from './ui/TaskStats';
 import SettingsModal from './ui/SettingsModal';
 import AuthScreen from './ui/AuthScreen';
+import ErrorBoundary from './ui/ErrorBoundary';
 import { useAuth } from './contexts/AuthContext';
 
 // Chargement différé — code splitting pour les composants conditionnels
@@ -161,6 +162,7 @@ export default function App() {
         />
 
         {draft.draft && (
+          <ErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <DraftEditor
               draft={draft.draft}
@@ -189,6 +191,7 @@ export default function App() {
               cancelLabel={t("btn.cancel")}
             />
           </Suspense>
+          </ErrorBoundary>
         )}
 
         <TaskList
@@ -218,6 +221,7 @@ export default function App() {
         )}
 
         {showWelcome && (
+          <ErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <WelcomeModal
               onClose={() => { setShowWelcome(false); localStorage.setItem('hasVisited', 'true'); }}
@@ -226,9 +230,11 @@ export default function App() {
               startButton={t("welcome.start")} learnMoreButton={t("welcome.learnMore")}
             />
           </Suspense>
+          </ErrorBoundary>
         )}
 
         {editingTask && (
+          <ErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <EditTaskModal
               task={editingTask}
@@ -245,6 +251,7 @@ export default function App() {
               saveButton={t("btn.save")} cancelButton={t("btn.cancel")} improveButton={t("btn.improve")}
             />
           </Suspense>
+          </ErrorBoundary>
         )}
 
         {showSettings && (
