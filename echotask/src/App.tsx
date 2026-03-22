@@ -198,10 +198,6 @@ export default function App() {
               onDraftChange={draft.setDraft}
               onCleanChange={draft.setClean}
               onTagsChange={draft.setTags}
-              onImprove={async () => {
-                if (allowCloudAI && apiKey) await draft.improveCloud(apiKey, lang);
-                else draft.improveLocal();
-              }}
               onSave={async () => {
                 const c = draft.getContent();
                 await manager.add(c.raw, c.clean, c.tags);
@@ -213,7 +209,6 @@ export default function App() {
               rawLabel={t("raw")}
               cleanLabel={t("clean")}
               tagsPlaceholder={t("draft.tags.placeholder")}
-              improveLabel={t("btn.improve")}
               saveLabel={t("btn.save")}
               cancelLabel={t("btn.cancel")}
             />
@@ -289,10 +284,6 @@ export default function App() {
             task={editingTask}
             onSave={async (t) => { await manager.update(t); setEditingTask(null); toast(t("toast.updated"), { type: 'success' }); }}
             onCancel={() => setEditingTask(null)}
-            onImprove={async () => {
-              if (allowCloudAI && apiKey) return await cloudRewrite(editingTask.rawText, apiKey, lang);
-              return localRewrite(editingTask.rawText);
-            }}
             title={t("edit.title")} rawLabel={t("raw")} cleanLabel={t("clean")}
             tagsLabel={t("tags")} tagsPlaceholder={t("edit.tagsPlaceholder")}
             dueLabel={t("due.label")} duePlaceholder={t("due.placeholder")}
@@ -306,10 +297,6 @@ export default function App() {
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
-          allowCloudAI={allowCloudAI}
-          apiKey={apiKey}
-          onToggleCloudAI={() => setAllowCloudAI(v => !v)}
-          onApiKeyChange={setApiKey}
           onImportDone={manager.refresh}
         />
       )}

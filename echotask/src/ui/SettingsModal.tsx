@@ -9,11 +9,12 @@ import { toast } from './Toast';
 
 interface SettingsModalProps {
   onClose: () => void;
-  allowCloudAI: boolean;
-  apiKey: string;
-  onToggleCloudAI: () => void;
-  onApiKeyChange: (key: string) => void;
   onImportDone: () => void;
+  // IA cloud — désactivé temporairement
+  allowCloudAI?: boolean;
+  apiKey?: string;
+  onToggleCloudAI?: () => void;
+  onApiKeyChange?: (key: string) => void;
 }
 
 export default function SettingsModal({
@@ -379,7 +380,9 @@ export default function SettingsModal({
               style={{ display: 'none' }} aria-hidden />
           </section>
 
-          {/* IA */}
+          {/* IA — temporairement masqué */}
+          {/* À réactiver : décommenter cette section + restaurer les props dans App.tsx */}
+          {false && (
           <section style={{ paddingBottom: 'var(--space-2)' }}>
             <p style={sectionLabel}>Intelligence Artificielle</p>
             <p style={{ margin: '0 0 var(--space-4)', fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', lineHeight: 1.5 }}>
@@ -410,7 +413,7 @@ export default function SettingsModal({
                   >
                     <label style={{ ...sectionLabel, display: 'block', marginBottom: 4 }}>Clé API OpenAI</label>
                     <input type="password" placeholder="sk-..." value={apiKey}
-                      onChange={e => onApiKeyChange(e.target.value)}
+                      onChange={e => onApiKeyChange?.(e.target.value)}
                       style={ghost} onFocus={onFocus} onBlur={onBlur}
                     />
                   </motion.div>
@@ -418,6 +421,7 @@ export default function SettingsModal({
               </AnimatePresence>
             </div>
           </section>
+          )}
         </div>
       </motion.div>
       </div>
