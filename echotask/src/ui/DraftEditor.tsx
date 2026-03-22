@@ -9,14 +9,14 @@ interface DraftEditorProps {
   onDraftChange: (text: string) => void;
   onCleanChange: (text: string) => void;
   onTagsChange: (tags: string) => void;
-  onImprove: () => void;
+  onImprove?: () => void;
   onSave: () => void;
   onCancel: () => void;
   title: string;
   rawLabel: string;
   cleanLabel: string;
   tagsPlaceholder: string;
-  improveLabel: string;
+  improveLabel?: string;
   saveLabel: string;
   cancelLabel: string;
 }
@@ -109,10 +109,12 @@ export default function DraftEditor({
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-        <motion.button type="button" onClick={onImprove} whileTap={{ scale: 0.95 }}
-          style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)', border: 'none', borderRadius: 'var(--radius-full)', padding: '8px var(--space-4)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}>
-          ✦ {improveLabel}
-        </motion.button>
+        {onImprove && (
+          <motion.button type="button" onClick={onImprove} whileTap={{ scale: 0.95 }}
+            style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)', border: 'none', borderRadius: 'var(--radius-full)', padding: '8px var(--space-4)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'var(--font-family)' }}>
+            ✦ {improveLabel}
+          </motion.button>
+        )}
         <motion.button type="button" onClick={onSave} whileTap={{ scale: 0.95 }}
           style={{ background: 'var(--color-text)', color: 'white', border: 'none', borderRadius: 'var(--radius-full)', padding: '8px var(--space-4)', fontSize: 'var(--text-sm)', cursor: 'pointer', fontFamily: 'var(--font-family)', fontWeight: 'var(--font-medium)' }}>
           {saveLabel}
