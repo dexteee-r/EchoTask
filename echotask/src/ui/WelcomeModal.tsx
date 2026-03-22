@@ -46,6 +46,12 @@ export default function WelcomeModal({
         }}
       />
 
+      {/* Wrapper centrage */}
+      <div style={{
+        position: 'fixed', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1401, pointerEvents: 'none',
+      }}>
       {/* Card */}
       <motion.div
         key="welcome-card"
@@ -55,9 +61,7 @@ export default function WelcomeModal({
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         onClick={e => e.stopPropagation()}
         style={{
-          position: 'fixed',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'auto',
           width: 'min(92vw, 420px)',
           background: 'var(--color-glass)',
           backdropFilter: 'blur(28px)',
@@ -66,7 +70,6 @@ export default function WelcomeModal({
           border: '1px solid var(--color-glass-border)',
           boxShadow: '0 24px 80px rgba(0,0,0,0.10)',
           padding: 'var(--space-8)',
-          zIndex: 1401,
         }}
       >
         {/* Titre */}
@@ -160,6 +163,7 @@ export default function WelcomeModal({
           </motion.button>
         </div>
       </motion.div>
+      </div>
     </AnimatePresence>
   );
 }

@@ -150,7 +150,14 @@ export default function SettingsModal({
         }}
       />
 
-      {/* Card */}
+      {/* Wrapper centrage — position fixed + flex, Framer Motion ne touche pas au transform de centrage */}
+      <div
+        style={{
+          position: 'fixed', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1401, pointerEvents: 'none',
+        }}
+      >
       <motion.div
         key="settings-card"
         initial={{ opacity: 0, y: 20, scale: 0.97, filter: 'blur(6px)' }}
@@ -159,9 +166,7 @@ export default function SettingsModal({
         transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
         onClick={e => e.stopPropagation()}
         style={{
-          position: 'fixed',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'auto',
           width: 'min(94vw, 460px)',
           maxHeight: '88vh',
           display: 'flex',
@@ -172,7 +177,6 @@ export default function SettingsModal({
           borderRadius: 24,
           border: '1px solid var(--color-glass-border)',
           boxShadow: '0 24px 80px rgba(0,0,0,0.10)',
-          zIndex: 1401,
         }}
       >
         {/* Header fixe */}
@@ -416,6 +420,7 @@ export default function SettingsModal({
           </section>
         </div>
       </motion.div>
+      </div>
     </AnimatePresence>
   );
 }
