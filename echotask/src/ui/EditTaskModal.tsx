@@ -110,6 +110,12 @@ export default function EditTaskModal({
         }}
       />
 
+      {/* Wrapper centrage */}
+      <div style={{
+        position: 'fixed', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1401, pointerEvents: 'none',
+      }}>
       {/* Card */}
       <motion.div
         key="edit-card"
@@ -119,9 +125,7 @@ export default function EditTaskModal({
         transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
         onClick={e => e.stopPropagation()}
         style={{
-          position: 'fixed',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'auto',
           width: 'min(94vw, 460px)',
           maxHeight: '90vh',
           display: 'flex',
@@ -133,7 +137,6 @@ export default function EditTaskModal({
           border: '1px solid var(--color-glass-border)',
           boxShadow: '0 24px 80px rgba(0,0,0,0.10)',
           padding: 'var(--space-7)',
-          zIndex: 1401,
         }}
       >
         {/* Header */}
@@ -277,6 +280,7 @@ export default function EditTaskModal({
           </motion.button>
         </div>
       </motion.div>
+      </div>
     </AnimatePresence>
   );
 }
